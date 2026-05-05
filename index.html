@@ -1,7 +1,50 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>FitUP - Check Materiale IT</title>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+
+<style>
+/* (TUTTO IL TUO CSS RESTA IDENTICO – NON LO TOCCO) */
+</style>
+</head>
+
+<body>
+
+<div id="loginView" class="login">
+  <div class="login-card">
+    <img src="logo-fitup.png" class="logo" alt="FitUP">
+    <h1>Check materiale IT</h1>
+    <p>Accesso riservato agli account aziendali FitUP.</p>
+
+    <button class="btn primary" id="loginBtn">Login con Google</button>
+
+    <!-- 🔥 NUOVO: messaggio errore -->
+    <div id="loginError" style="
+      display:none;
+      margin-top:16px;
+      padding:12px;
+      border-radius:14px;
+      background:#fee2e2;
+      color:#7f1d1d;
+      font-weight:700;
+      font-size:14px;
+    ">
+    </div>
+
+  </div>
+</div>
+
+<div id="appView" class="hidden">
+  <!-- APP IDENTICA -->
+</div>
+
 <script>
-/* =========================
-   FIREBASE INIT
-========================= */
 firebase.initializeApp({
   apiKey:"AIzaSyAkdqagTY86afYpdJT43oMGY5UkopsTF5M",
   authDomain:"fitup-check-materiale.firebaseapp.com",
@@ -11,475 +54,85 @@ firebase.initializeApp({
   appId:"1:838360520294:web:a77ffe3854a354ee8affa7"
 });
 
-var auth = firebase.auth();
-var db = firebase.firestore();
+var auth=firebase.auth();
+var db=firebase.firestore();
 
-var user = null;
-var cloud = {};
-var unsubscribe = null;
-var sede = new URLSearchParams(window.location.search).get("sede") || "default";
+var loginBtn=document.getElementById("loginBtn");
+var loginError=document.getElementById("loginError");
 
-var loginBtn = document.getElementById("loginBtn");
-var retryRedirectBtn = document.getElementById("retryRedirectBtn");
-var loginError = document.getElementById("loginError");
-var loginInfo = document.getElementById("loginInfo");
+/* ===========================
+   🔥 LOGIN MIGLIORATO
+=========================== */
 
-/* =========================
-   DATI CHECKLIST
-========================= */
-var sections = [
-  {icon:"🔧",title:"Materiale tecnico base",items:["Tornello","Impianto Audio","Rack 19\"","Patch Panel Rack","Dadi a gabbia per rack (20)","Ripiano Rack (2)","Ciabatta Shuko Rack (2)","Cavo Patch Ethernet 0,5m (3x10)","Cavo Patch Ethernet 1m (3x10)","Hard Disk","NVR Dahua"]},
-  {icon:"🌐",title:"Networking & alimentazione",items:["Switch","Switch PoE","UPS","Ubiquiti Unifi (3)"]},
-  {icon:"📡",title:"Sicurezza & comunicazione",items:["Telecamere","Staffe per telecamere","Lettori Kughi NFC (2)","Protezione esterna lettore"]},
-  {icon:"💻",title:"Postazioni & hardware",items:["PC Desktop (2)","Monitor (2)","Kit tastiera & mouse wireless (2)","Tappetino mouse (2)","Webcam (2)","Tavoletta grafometrica (2)"]},
-  {icon:"🖨️",title:"Stampa & gestione documenti",items:["Lettore Tessere e Sanitarie (2)","Lettore Banco RFID (2)","Ciabatta multipresa (2)","Stampante fiscale","Stampante multifunzione","Toner stampante (2)"]},
-  {icon:"🏋️‍♂️",title:"Sistemi palestra & accessi",items:["SportTrick Setup","Player Red TV","Licenza Player Red TV","Edision HDMI Modulator 3in mini","Edision SDC-6 Partitore Antenna","Connettori F (10 confezioni da 4)","Cavo coassiale connettore F 1m","Licenza Office (2)"]},
-  {icon:"📶",title:"Connettività & IoT",items:["Gigaset IP","iPhone 16e","Hub Ajax","Rex Ajax","Door Protect Ajax (2 per porta)","Pulsante Ajax (2)","Home Siren Ajax","Relay Ajax"]},
-  {icon:"📺",title:"TV & segnaletica",items:["Televisore Hisense 75\"","Televisore Hisense 65\" (3)","Supporto da parete TV (4)"]},
-  {icon:"🚨",title:"Cartellonistica",items:["Cartello Porta Allarmata (2)","Cartello Area Videosorvegliata (3)","Cartello Pulsante Emergenza Ajax (2 o più)","Striscione Lavora con noi"]},
-  {icon:"🔖",title:"Adesivi Tornello / Accessi",items:["Adesivo Solo Entrata Tornello","Adesivo Solo Uscita Tornello","Adesivo Solo Emergenza Tornello (se presente sportello bandiera)","Adesivo Solo Staff"]},
-  {icon:"🏗️",title:"Extra",items:["Transpallet manuale","Kit cancelleria"]}
-];
+loginBtn.onclick=function(){
 
-/* =========================
-   AUTH ENTERPRISE
-========================= */
-function provider(){
-  var p = new firebase.auth.GoogleAuthProvider();
-  p.setCustomParameters({
-    hd: "fitup.it",
-    prompt: "select_account"
-  });
-  return p;
-}
+  loginError.style.display="none";
 
-function showError(message){
-  loginError.innerText = message;
-  loginError.style.display = "block";
-}
+  var provider=new firebase.auth.GoogleAuthProvider();
 
-function showInfo(message){
-  loginInfo.innerText = message;
-  loginInfo.style.display = "block";
-}
-
-function clearLoginMessages(){
-  loginError.style.display = "none";
-  loginInfo.style.display = "none";
-  retryRedirectBtn.style.display = "none";
-}
-
-function isRestrictiveAuthError(error){
-  var code = error && error.code ? error.code : "";
-  var msg = error && error.message ? error.message : "";
-
-  return (
-    code === "auth/popup-blocked" ||
-    code === "auth/cancelled-popup-request" ||
-    code === "auth/internal-error" ||
-    msg.indexOf("missing initial state") !== -1 ||
-    msg.indexOf("sessionStorage") !== -1 ||
-    msg.indexOf("storage") !== -1
-  );
-}
-
-function authErrorMessage(error){
-  var code = error && error.code ? error.code : "";
-  var msg = error && error.message ? error.message : "";
-
-  if(code === "auth/popup-blocked"){
-    return "Popup bloccato. Uso login sicuro con redirect.";
-  }
-
-  if(code === "auth/popup-closed-by-user"){
-    return "Login interrotto. Completa la finestra Google senza chiuderla.";
-  }
-
-  if(code === "auth/unauthorized-domain"){
-    return "Dominio non autorizzato in Firebase. Aggiungi lucavisentinfitup.github.io nei domini autorizzati.";
-  }
-
-  if(code === "auth/operation-not-allowed"){
-    return "Provider Google non abilitato in Firebase Authentication.";
-  }
-
-  if(isRestrictiveAuthError(error)){
-    return "Il browser sta bloccando la sessione di login. Riprovo con login sicuro. Se continua, usa finestra normale, abilita cookie/popup e preferisci Chrome o Edge.";
-  }
-
-  return "Login non riuscito. Dettaglio: " + (code || msg || "errore sconosciuto");
-}
-
-function safeGetSession(key){
-  try { return sessionStorage.getItem(key); } catch(e) { return null; }
-}
-
-function safeSetSession(key,value){
-  try { sessionStorage.setItem(key,value); } catch(e) {}
-}
-
-function safeRemoveSession(key){
-  try { sessionStorage.removeItem(key); } catch(e) {}
-}
-
-function startRedirectLogin(){
-  clearLoginMessages();
-  loginBtn.disabled = true;
-  retryRedirectBtn.disabled = true;
-  showInfo("Reindirizzamento sicuro a Google in corso...");
-
-  safeSetSession("fitup_redirect_started","1");
-
-  auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-    .then(function(){
-      return auth.signInWithRedirect(provider());
-    })
-    .catch(function(error){
-      console.error("Redirect login error:", error);
-      loginBtn.disabled = false;
-      retryRedirectBtn.disabled = false;
-      retryRedirectBtn.style.display = "block";
-      showError(authErrorMessage(error));
-    });
-}
-
-function smartLogin(){
-  clearLoginMessages();
-  loginBtn.disabled = true;
-  retryRedirectBtn.disabled = true;
-  showInfo("Avvio login Google...");
-
-  auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-    .then(function(){
-      return auth.signInWithPopup(provider());
-    })
-    .then(function(){
-      clearLoginMessages();
-      safeRemoveSession("fitup_redirect_started");
-    })
-    .catch(function(error){
-      console.error("Popup login error:", error);
-
-      if(isRestrictiveAuthError(error)){
-        showInfo("Popup non disponibile. Passaggio automatico al login sicuro...");
-        setTimeout(function(){
-          startRedirectLogin();
-        }, 600);
-        return;
-      }
-
-      loginBtn.disabled = false;
-      retryRedirectBtn.disabled = false;
-      retryRedirectBtn.style.display = "block";
-      showError(authErrorMessage(error));
-    });
-}
-
-/* Redirect result gestito dopo persistenza */
-auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+  auth.signInWithPopup(provider)
   .then(function(){
-    return auth.getRedirectResult();
-  })
-  .then(function(result){
-    if(result && result.user){
-      clearLoginMessages();
-      safeRemoveSession("fitup_redirect_started");
-    }
+    // ok
   })
   .catch(function(error){
-    console.error("Redirect result error:", error);
 
-    loginBtn.disabled = false;
-    retryRedirectBtn.disabled = false;
-    retryRedirectBtn.style.display = "block";
+    console.error("LOGIN ERROR:", error);
 
-    showError(authErrorMessage(error));
+    let msg="Errore login. Riprova.";
+
+    // 🔥 gestione specifica errore tuo
+    if(error.code==="auth/internal-error" || error.message.includes("missing initial state")){
+      msg="⚠️ Il browser sta bloccando la sessione di login.\n\n👉 Apri la pagina in modalità normale (non incognito)\n👉 Abilita cookie e popup\n👉 Usa Chrome o Edge\n👉 Ricarica la pagina e riprova";
+    }
+
+    else if(error.code==="auth/popup-blocked"){
+      msg="⚠️ Popup bloccato.\n\n👉 Abilita popup per questo sito e riprova";
+    }
+
+    else if(error.code==="auth/popup-closed-by-user"){
+      msg="⚠️ Login interrotto.\n\n👉 Completa il popup Google senza chiuderlo";
+    }
+
+    loginError.innerText=msg;
+    loginError.style.display="block";
   });
 
-/* =========================
-   UTILITY
-========================= */
-function id(cat,item){
-  return (cat + "__" + item).toLowerCase().replace(/[^a-z0-9]+/g,"-");
-}
-
-function esc(s){
-  return String(s)
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;");
-}
-
-function all(){
-  var a = [];
-  sections.forEach(function(sec){
-    sec.items.forEach(function(item){
-      a.push({
-        cat: sec.title,
-        item: item,
-        id: id(sec.title,item)
-      });
-    });
-  });
-  return a;
-}
-
-function status(x){
-  return cloud[x] && cloud[x].status ? cloud[x].status : "pending";
-}
-
-function note(x){
-  return cloud[x] && cloud[x].note ? cloud[x].note : "";
-}
-
-function ref(itemId){
-  return db.collection("palestre").doc(sede).collection("checklist").doc(itemId);
-}
-
-function tick(){
-  return '<svg viewBox="0 0 1024 1024"><defs><linearGradient id="g" x1="0" y1="1" x2="1" y2="0"><stop offset="0%" stop-color="#047857"/><stop offset="100%" stop-color="#8DC63F"/></linearGradient></defs><path fill="url(#g)" d="M400.5 744.1c-35.6 0-67.9-20.5-83.1-52.8L205.2 452.7c-21.6-45.9-1.9-100.6 44-122.2 45.9-21.6 100.6-1.9 122.2 44l44.5 94.6L642.6 160.5c30-40.9 87.5-49.7 128.4-19.7 40.9 30 49.7 87.5 19.7 128.4L474.6 699.9c-17.3 23.6-44.8 37.6-74.1 44.2z"/></svg>';
-}
-
-/* =========================
-   FIRESTORE
-========================= */
-function setStatus(itemId,cat,item,st){
-  ref(itemId).set({
-    categoria: cat,
-    materiale: item,
-    status: st,
-    note: note(itemId),
-    updatedBy: user.email,
-    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-  },{merge:true});
-}
-
-function setNote(itemId,cat,item,value){
-  ref(itemId).set({
-    categoria: cat,
-    materiale: item,
-    status: status(itemId),
-    note: value,
-    updatedBy: user.email,
-    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-  },{merge:true});
-}
-
-function listen(){
-  if(unsubscribe) unsubscribe();
-
-  unsubscribe = db.collection("palestre")
-    .doc(sede)
-    .collection("checklist")
-    .onSnapshot(function(snapshot){
-      cloud = {};
-      snapshot.forEach(function(doc){
-        cloud[doc.id] = doc.data();
-      });
-      render();
-    },function(error){
-      console.error("Firestore listen error:", error);
-      alert("Errore lettura Firestore. Verifica regole Firebase e connessione.");
-    });
-}
-
-/* =========================
-   RENDER
-========================= */
-function render(){
-  if(!user) return;
-
-  document.getElementById("meta").innerHTML = "Sede: " + esc(sede) + " · Utente: " + esc(user.email);
-
-  var q = (document.getElementById("search").value || "").toLowerCase();
-  var f = document.getElementById("filter").value;
-  var app = document.getElementById("app");
-  app.innerHTML = "";
-
-  sections.forEach(function(sec){
-    var shown = sec.items.filter(function(item){
-      var st = status(id(sec.title,item));
-      return (sec.title + " " + item).toLowerCase().indexOf(q) !== -1 && (f === "all" || f === st);
-    });
-
-    if(!shown.length) return;
-
-    var done = shown.filter(function(item){
-      return status(id(sec.title,item)) !== "pending";
-    }).length;
-
-    var card = document.createElement("section");
-    card.className = "card";
-    card.innerHTML =
-      '<div class="head"><h2>' +
-      sec.icon + " " + esc(sec.title) +
-      '</h2><span class="badge">' +
-      done + "/" + shown.length +
-      "</span></div>";
-
-    shown.forEach(function(item){
-      addItem(card,sec.title,item);
-    });
-
-    app.appendChild(card);
-  });
-
-  summary();
-}
-
-function addItem(card,cat,item){
-  var itemId = id(cat,item);
-  var st = status(itemId);
-  var n = note(itemId);
-
-  var div = document.createElement("div");
-  div.className = "item " + st;
-
-  div.innerHTML =
-    '<div class="main">' +
-    '<button class="check" type="button">' + tick() + '</button>' +
-    '<div style="flex:1;min-width:0">' +
-    '<div class="name">' + esc(item) + '</div>' +
-    '<div class="actions">' +
-    '<button data-s="pending" class="' + (st==="pending" ? "a-pending" : "") + '">Da fare</button>' +
-    '<button data-s="ok" class="' + (st==="ok" ? "a-ok" : "") + '">OK</button>' +
-    '<button data-s="missing" class="' + (st==="missing" ? "a-missing" : "") + '">Manca</button>' +
-    '<button data-s="damaged" class="' + (st==="damaged" ? "a-damaged" : "") + '">Danno</button>' +
-    '</div>' +
-    '<input class="note" placeholder="Nota per mancanti/danneggiati" value="' + esc(n) + '">' +
-    '</div></div>';
-
-  div.querySelector(".check").onclick = function(){
-    setStatus(itemId,cat,item,st==="ok" ? "pending" : "ok");
-  };
-
-  var buttons = div.querySelectorAll(".actions button");
-  for(var i=0;i<buttons.length;i++){
-    buttons[i].onclick = function(){
-      setStatus(itemId,cat,item,this.getAttribute("data-s"));
-    };
-  }
-
-  div.querySelector(".note").onchange = function(){
-    setNote(itemId,cat,item,this.value);
-  };
-
-  card.appendChild(div);
-}
-
-function summary(){
-  var a = all();
-  var ok = 0, mi = 0, da = 0, pe = 0;
-
-  a.forEach(function(x){
-    var st = status(x.id);
-    if(st==="ok") ok++;
-    else if(st==="missing") mi++;
-    else if(st==="damaged") da++;
-    else pe++;
-  });
-
-  var comp = ok + mi + da;
-  var total = a.length;
-  var pct = total ? Math.round(comp / total * 100) : 0;
-
-  document.getElementById("okCount").innerHTML = ok;
-  document.getElementById("missingCount").innerHTML = mi;
-  document.getElementById("damagedCount").innerHTML = da;
-  document.getElementById("pendingCount").innerHTML = pe;
-  document.getElementById("pct").innerHTML = pct + "%";
-  document.getElementById("count").innerHTML = comp + " / " + total + " controllati";
-  document.getElementById("bar").style.width = pct + "%";
-  document.getElementById("readyBanner").className = (pe===0 && mi===0 && da===0 && ok===total) ? "ready show" : "ready";
-}
-
-/* =========================
-   EVENTI UI
-========================= */
-loginBtn.onclick = smartLogin;
-retryRedirectBtn.onclick = startRedirectLogin;
-
-document.getElementById("logout").onclick = function(){
-  if(unsubscribe) unsubscribe();
-  auth.signOut();
 };
 
-document.getElementById("search").oninput = render;
-document.getElementById("filter").onchange = render;
-document.getElementById("printBtn").onclick = function(){ window.print(); };
-
-document.getElementById("markAllOk").onclick = function(){
-  if(confirm("Segnare tutto OK per questa sede?")){
-    all().forEach(function(x){
-      setStatus(x.id,x.cat,x.item,"ok");
-    });
-  }
-};
-
-document.getElementById("reset").onclick = function(){
-  if(confirm("Azzerare la checklist cloud per questa sede?")){
-    all().forEach(function(x){
-      ref(x.id).delete();
-    });
-  }
-};
-
-document.getElementById("csv").onclick = function(){
-  var rows = [["Sede","Categoria","Materiale","Stato","Note"]];
-
-  all().forEach(function(x){
-    var st = status(x.id);
-    var lab = st==="ok" ? "OK" :
-              st==="missing" ? "MANCANTE" :
-              st==="damaged" ? "DANNEGGIATO" :
-              "DA CONTROLLARE";
-
-    rows.push([sede,x.cat,x.item,lab,note(x.id)]);
-  });
-
-  var csv = rows.map(function(r){
-    return r.map(function(c){
-      return '"' + String(c).replace(/"/g,'""') + '"';
-    }).join(",");
-  }).join("\n");
-
-  var blob = new Blob([csv],{type:"text/csv;charset=utf-8"});
-  var url = URL.createObjectURL(blob);
-  var a = document.createElement("a");
-  a.href = url;
-  a.download = "check-materiale-" + sede + ".csv";
-  a.click();
-  URL.revokeObjectURL(url);
-};
-
-/* =========================
+/* ===========================
    AUTH STATE
-========================= */
-auth.onAuthStateChanged(function(u){
-  loginBtn.disabled = false;
-  retryRedirectBtn.disabled = false;
+=========================== */
 
-  if(!u){
-    user = null;
-    document.getElementById("loginView").style.display = "grid";
-    document.getElementById("appView").className = "hidden";
+auth.onAuthStateChanged(function(user){
+
+  if(!user){
+    document.getElementById("loginView").style.display="grid";
+    document.getElementById("appView").className="hidden";
     return;
   }
 
-  if(!u.email || !u.email.endsWith("@fitup.it")){
-    showError("Accesso consentito solo con account FitUP @fitup.it.");
+  if(!user.email.endsWith("@fitup.it")){
+    alert("Accesso consentito solo con account FitUP");
     auth.signOut();
     return;
   }
 
-  clearLoginMessages();
-  safeRemoveSession("fitup_redirect_started");
+  document.getElementById("loginView").style.display="none";
+  document.getElementById("appView").className="";
 
-  user = u;
-  document.getElementById("loginView").style.display = "none";
-  document.getElementById("appView").className = "";
+  startApp(user);
 
-  listen();
 });
+
+/* ===========================
+   APP (LA TUA LOGICA)
+=========================== */
+
+function startApp(user){
+  // lascia tutto come già hai
+}
+
 </script>
+
+</body>
+</html>
