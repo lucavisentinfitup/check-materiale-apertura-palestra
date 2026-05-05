@@ -4,121 +4,512 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>FitUP - Check Materiale IT</title>
+<meta name="theme-color" content="#1D1D1B">
+
 <style>
 :root{
   --fit-green:#8DC63F;
   --fit-black:#1D1D1B;
   --fit-white:#FFFFFF;
-  --bg:#f3f5f1;
-  --card:#ffffff;
+  --bg:#10110f;
+  --glass:rgba(255,255,255,.72);
+  --glass-dark:rgba(29,29,27,.72);
+  --line-green:rgba(141,198,63,.7);
+  --line-black:rgba(29,29,27,.35);
   --text:#1D1D1B;
   --muted:#6b7280;
-  --line:#dfe6d8;
   --ok:#8DC63F;
   --warn:#f59e0b;
   --bad:#dc2626;
   --pending:#94a3b8;
+  --shadow:0 20px 60px rgba(0,0,0,.22);
+  --radius:28px;
 }
+
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(180deg,var(--fit-black) 0, var(--fit-black) 250px, var(--bg) 250px);color:var(--text)}
-button,input,select{font-family:inherit;font-size:16px}
-.wrap{max-width:1280px;margin:auto;padding:22px}
-.hero{background:var(--fit-black);color:var(--fit-white);border:1px solid rgba(255,255,255,.12);border-radius:28px;padding:24px;display:flex;justify-content:space-between;gap:20px;box-shadow:0 16px 40px rgba(0,0,0,.28)}
-.logo{height:72px;max-width:210px;object-fit:contain}
-.hero h1{margin:12px 0 6px;font-size:38px;line-height:1}
-.sub{color:rgba(255,255,255,.75)}
-.device{display:inline-block;margin-top:12px;padding:8px 12px;border-radius:999px;background:rgba(141,198,63,.14);color:var(--fit-green);font-weight:900}
-.progress{text-align:right;min-width:180px}
-.pct{font-size:48px;font-weight:900;color:var(--fit-green)}
-.count{color:rgba(255,255,255,.75);font-weight:800}
-.bar{height:14px;background:rgba(255,255,255,.18);border-radius:99px;overflow:hidden;margin:16px 0}
-.bar div{height:100%;width:0;background:linear-gradient(90deg,#8DC63F,#b6e96e);transition:.2s}
-.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
-.stat{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;box-shadow:0 8px 24px rgba(0,0,0,.07)}
-.stat small{color:var(--muted);font-weight:900}
-.stat strong{display:block;margin-top:8px;font-size:30px}
-.stat.ok strong{color:var(--ok)}.stat.warn strong{color:var(--warn)}.stat.bad strong{color:var(--bad)}.stat.pending strong{color:var(--pending)}
-.toolbar{background:#fff;border:1px solid var(--line);border-radius:22px;padding:14px;margin-bottom:16px;display:grid;grid-template-columns:1fr 190px 150px 150px;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,.07)}
-input,select{width:100%;min-height:50px;border:1px solid var(--line);border-radius:16px;padding:12px 14px;background:#fff}
-.btn{border:0;border-radius:16px;min-height:50px;padding:12px 14px;font-weight:900;cursor:pointer}
-.primary{background:var(--fit-green);color:var(--fit-black)}
-.secondary{background:var(--fit-black);color:#fff}
-.light{background:#fff;border:1px solid var(--line);color:var(--fit-black)}
-.ready{display:none;background:#e7f7d9;border:1px solid var(--fit-green);color:#355d12;border-radius:20px;padding:16px;margin-bottom:16px;text-align:center;font-weight:900}
+
+html{
+  -webkit-text-size-adjust:100%;
+}
+
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  color:var(--text);
+  min-height:100vh;
+  background:
+    radial-gradient(circle at 15% 10%, rgba(141,198,63,.35), transparent 30%),
+    radial-gradient(circle at 85% 0%, rgba(141,198,63,.18), transparent 28%),
+    linear-gradient(145deg,#1D1D1B 0%,#151613 38%,#eef5e8 38%,#f6f8f3 100%);
+  background-attachment:fixed;
+}
+
+button,input,select{
+  font-family:inherit;
+  font-size:16px;
+}
+
+.wrap{
+  max-width:1320px;
+  margin:auto;
+  padding:24px;
+}
+
+.glass{
+  background:rgba(255,255,255,.70);
+  border:1.5px solid rgba(255,255,255,.55);
+  box-shadow:var(--shadow);
+  backdrop-filter:blur(22px) saturate(160%);
+  -webkit-backdrop-filter:blur(22px) saturate(160%);
+}
+
+.hero{
+  position:relative;
+  overflow:hidden;
+  border-radius:34px;
+  padding:26px;
+  display:flex;
+  justify-content:space-between;
+  gap:24px;
+  align-items:center;
+  background:
+    linear-gradient(135deg,rgba(29,29,27,.92),rgba(29,29,27,.74)),
+    radial-gradient(circle at top right,rgba(141,198,63,.45),transparent 35%);
+  border:2px solid var(--fit-green);
+  color:#fff;
+  box-shadow:0 28px 80px rgba(0,0,0,.35);
+}
+
+.hero:before{
+  content:"";
+  position:absolute;
+  inset:-2px;
+  background:linear-gradient(120deg,transparent,rgba(255,255,255,.16),transparent);
+  transform:translateX(-70%);
+  animation:shine 6s infinite;
+  pointer-events:none;
+}
+
+@keyframes shine{
+  0%{transform:translateX(-80%)}
+  40%,100%{transform:translateX(120%)}
+}
+
+.logo-wrap{
+  display:flex;
+  align-items:center;
+  gap:18px;
+}
+
+.fit-logo{
+  width:220px;
+  max-width:100%;
+  height:auto;
+  display:block;
+  filter:drop-shadow(0 10px 24px rgba(0,0,0,.35));
+}
+
+.hero h1{
+  margin:14px 0 6px;
+  font-size:40px;
+  line-height:1;
+  letter-spacing:-1px;
+}
+
+.sub{
+  color:rgba(255,255,255,.78);
+  line-height:1.45;
+  max-width:720px;
+}
+
+.device{
+  display:inline-flex;
+  margin-top:14px;
+  padding:9px 14px;
+  border-radius:999px;
+  color:var(--fit-green);
+  border:1px solid rgba(141,198,63,.6);
+  background:rgba(141,198,63,.12);
+  font-weight:900;
+}
+
+.progress{
+  text-align:right;
+  min-width:190px;
+}
+
+.pct{
+  font-size:54px;
+  font-weight:900;
+  color:var(--fit-green);
+  line-height:1;
+}
+
+.count{
+  color:rgba(255,255,255,.78);
+  font-weight:900;
+  margin-top:8px;
+}
+
+.bar{
+  margin:18px 0;
+  height:16px;
+  border-radius:999px;
+  background:rgba(255,255,255,.38);
+  overflow:hidden;
+  border:1px solid rgba(29,29,27,.18);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+}
+
+.bar div{
+  height:100%;
+  width:0;
+  background:linear-gradient(90deg,#8DC63F,#d5ff9a);
+  box-shadow:0 0 18px rgba(141,198,63,.8);
+  transition:.25s;
+}
+
+.summary{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:14px;
+  margin-bottom:16px;
+}
+
+.stat{
+  border-radius:26px;
+  padding:18px;
+  border:2px solid var(--line-black);
+  background:rgba(255,255,255,.78);
+  box-shadow:0 18px 50px rgba(0,0,0,.14);
+  backdrop-filter:blur(18px) saturate(150%);
+  -webkit-backdrop-filter:blur(18px) saturate(150%);
+}
+
+.stat.ok{border-color:var(--fit-green)}
+.stat small{
+  color:#4b5563;
+  font-weight:900;
+}
+
+.stat strong{
+  display:block;
+  margin-top:8px;
+  font-size:34px;
+  font-weight:900;
+}
+
+.stat.ok strong{color:var(--fit-green)}
+.stat.warn strong{color:var(--warn)}
+.stat.bad strong{color:var(--bad)}
+.stat.pending strong{color:var(--pending)}
+
+.toolbar{
+  display:grid;
+  grid-template-columns:1fr 190px 155px 150px;
+  gap:12px;
+  padding:14px;
+  margin-bottom:18px;
+  border-radius:28px;
+  border:2px solid rgba(29,29,27,.22);
+  background:rgba(255,255,255,.78);
+  box-shadow:0 20px 60px rgba(0,0,0,.16);
+  backdrop-filter:blur(22px) saturate(170%);
+  -webkit-backdrop-filter:blur(22px) saturate(170%);
+}
+
+input,select{
+  width:100%;
+  min-height:54px;
+  border:2px solid rgba(29,29,27,.18);
+  border-radius:18px;
+  padding:13px 15px;
+  outline:none;
+  background:rgba(255,255,255,.82);
+}
+
+input:focus,select:focus{
+  border-color:var(--fit-green);
+  box-shadow:0 0 0 4px rgba(141,198,63,.22);
+}
+
+.btn{
+  border:0;
+  border-radius:18px;
+  min-height:54px;
+  padding:12px 16px;
+  font-weight:900;
+  cursor:pointer;
+  transition:.12s;
+}
+
+.btn:active{transform:scale(.98)}
+.primary{
+  background:linear-gradient(135deg,#8DC63F,#b9eb73);
+  color:var(--fit-black);
+  border:2px solid #6fa82f;
+}
+.secondary{
+  background:var(--fit-black);
+  color:#fff;
+  border:2px solid var(--fit-green);
+}
+.light{
+  background:rgba(255,255,255,.78);
+  color:var(--fit-black);
+  border:2px solid rgba(29,29,27,.28);
+}
+
+.ready{
+  display:none;
+  margin-bottom:18px;
+  padding:18px;
+  border-radius:26px;
+  text-align:center;
+  font-weight:900;
+  color:#244908;
+  background:rgba(220,252,231,.78);
+  border:2px solid var(--fit-green);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+}
 .ready.show{display:block}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
-.card{background:#fff;border:1px solid var(--line);border-radius:24px;padding:18px;box-shadow:0 8px 24px rgba(0,0,0,.07)}
-.head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
-h2{margin:0;font-size:18px}.badge{background:#edf6e4;color:#355d12;border-radius:999px;padding:7px 11px;font-size:12px;font-weight:900}
-.item{border:1px solid var(--line);border-radius:18px;padding:13px;margin:10px 0;background:#fff}
-.item.ok{background:#f1f9e9;border-color:var(--fit-green)}
-.item.missing{background:#fff7e6;border-color:#f59e0b}
-.item.damaged{background:#fff0f0;border-color:#dc2626}
-.main{display:flex;gap:12px;align-items:flex-start}
-.check{width:38px;height:38px;min-width:38px;border:2px solid #cbd5e1;border-radius:11px;background:#fff;display:grid;place-items:center;cursor:pointer}
-.check svg{width:30px;height:30px;opacity:0;transform:scale(.65);transition:.12s}
-.ok .check{border-color:var(--fit-green)}
-.ok .check svg{opacity:1;transform:scale(1)}
-.name{font-weight:900;line-height:1.25}.ok .name{color:#4b7d12}.missing .name{color:#92400e}.damaged .name{color:#991b1b}
-.actions{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
-.actions button{border:1px solid var(--line);background:#fff;border-radius:12px;min-height:42px;font-weight:900;cursor:pointer}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:18px;
+}
+
+.card{
+  border-radius:30px;
+  padding:18px;
+  border:2px solid rgba(29,29,27,.24);
+  background:rgba(255,255,255,.72);
+  box-shadow:0 20px 60px rgba(0,0,0,.16);
+  backdrop-filter:blur(24px) saturate(170%);
+  -webkit-backdrop-filter:blur(24px) saturate(170%);
+}
+
+.card:hover{
+  border-color:rgba(141,198,63,.75);
+}
+
+.head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  margin-bottom:14px;
+}
+
+h2{
+  margin:0;
+  font-size:19px;
+}
+
+.badge{
+  background:rgba(141,198,63,.16);
+  color:#355d12;
+  border:1px solid rgba(141,198,63,.55);
+  border-radius:999px;
+  padding:8px 12px;
+  font-size:12px;
+  font-weight:900;
+}
+
+.item{
+  position:relative;
+  overflow:hidden;
+  border:2px solid rgba(29,29,27,.18);
+  border-radius:22px;
+  padding:14px;
+  margin:11px 0;
+  background:rgba(255,255,255,.72);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.7),0 10px 28px rgba(0,0,0,.08);
+  backdrop-filter:blur(14px) saturate(150%);
+  -webkit-backdrop-filter:blur(14px) saturate(150%);
+}
+
+.item.ok{
+  background:rgba(241,249,233,.82);
+  border-color:var(--fit-green);
+}
+.item.missing{
+  background:rgba(255,247,230,.84);
+  border-color:#f59e0b;
+}
+.item.damaged{
+  background:rgba(255,240,240,.84);
+  border-color:#dc2626;
+}
+
+.main{
+  display:flex;
+  gap:13px;
+  align-items:flex-start;
+}
+
+.check{
+  width:42px;
+  height:42px;
+  min-width:42px;
+  border:2.5px solid rgba(29,29,27,.28);
+  border-radius:13px;
+  background:rgba(255,255,255,.86);
+  display:grid;
+  place-items:center;
+  cursor:pointer;
+  box-shadow:inset 0 1px 0 #fff,0 6px 16px rgba(0,0,0,.10);
+}
+
+.check svg{
+  width:32px;
+  height:32px;
+  opacity:0;
+  transform:scale(.62);
+  transition:.14s;
+}
+
+.ok .check{
+  border-color:var(--fit-green);
+  box-shadow:0 0 0 4px rgba(141,198,63,.18);
+}
+.ok .check svg{
+  opacity:1;
+  transform:scale(1);
+}
+
+.name{
+  font-weight:900;
+  line-height:1.28;
+}
+.ok .name{color:#4b7d12}
+.missing .name{color:#92400e}
+.damaged .name{color:#991b1b}
+
+.actions{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+  margin-top:12px;
+}
+
+.actions button{
+  border:2px solid rgba(29,29,27,.18);
+  background:rgba(255,255,255,.75);
+  border-radius:14px;
+  min-height:42px;
+  font-weight:900;
+  cursor:pointer;
+}
+
 .actions .a-pending{background:#475569;color:#fff}
-.actions .a-ok{background:var(--fit-green);color:var(--fit-black);border-color:var(--fit-green)}
-.actions .a-missing{background:#f59e0b;color:#111827;border-color:#f59e0b}
-.actions .a-damaged{background:#dc2626;color:#fff;border-color:#dc2626}
-.note{display:none;margin-top:10px}.missing .note,.damaged .note{display:block}
-.footer{display:flex;justify-content:flex-end;gap:10px;margin-top:18px;flex-wrap:wrap}
-@media(max-width:900px){.wrap{padding:12px}.hero{display:block}.progress{text-align:left;margin-top:18px}.summary{grid-template-columns:repeat(2,1fr)}.toolbar,.grid{grid-template-columns:1fr}.hero h1{font-size:30px}.actions{grid-template-columns:repeat(2,1fr)}.btn{width:100%}}
-@media(min-width:1450px){.grid{grid-template-columns:repeat(3,1fr)}}
-@media print{body{background:#fff}.toolbar,.footer,.actions,.note,.device{display:none}.hero,.card,.stat{box-shadow:none}.grid{grid-template-columns:1fr}}
+.actions .a-ok{background:var(--fit-green);color:var(--fit-black);border-color:#6fa82f}
+.actions .a-missing{background:#f59e0b;color:#111827;border-color:#d97706}
+.actions .a-damaged{background:#dc2626;color:#fff;border-color:#991b1b}
+
+.note{
+  display:none;
+  margin-top:10px;
+}
+.missing .note,.damaged .note{
+  display:block;
+}
+
+.footer{
+  display:flex;
+  justify-content:flex-end;
+  gap:12px;
+  margin-top:20px;
+  flex-wrap:wrap;
+}
+
+@media(max-width:900px){
+  .wrap{padding:12px}
+  .hero{display:block}
+  .logo-wrap{display:block}
+  .fit-logo{width:180px}
+  .hero h1{font-size:31px}
+  .progress{text-align:left;margin-top:18px}
+  .pct{font-size:44px}
+  .summary{grid-template-columns:repeat(2,1fr)}
+  .toolbar,.grid{grid-template-columns:1fr}
+  .actions{grid-template-columns:repeat(2,1fr)}
+  .btn{width:100%}
+}
+
+@media(min-width:1450px){
+  .grid{grid-template-columns:repeat(3,1fr)}
+}
+
+@media print{
+  body{background:#fff}
+  .toolbar,.footer,.actions,.note,.device{display:none}
+  .hero,.card,.stat{box-shadow:none}
+  .grid{grid-template-columns:1fr}
+}
 </style>
 </head>
 
 <body>
 <div class="wrap">
-  <section class="hero">
-    <div>
-      <img class="logo" alt="FitUP" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAAB4CAMAAAB/yz8SAAAAQlBMVEVHcEz///////////////////////+RwCbW57P///////////+QwCaRwCb///+RwCaRwCb///////+RwCb///+RwCYMYurFAAAAFXRSTlMAKNP++s+JqSvMchhIVq0kS0K8m+CG3xU7AAABcElEQVR4nO3Y2W6DMAwFUGuCwJaU9v//bQ9KoU6h0Qy9Qpk+zOieVxYcgB9AMAwAAAAAAAAAAAAAAAD4J8rYfbM+q7pYz7L+qfVqaE4xk6b30+xl+VdXy8vXo7XXlMbrV5Y9+8K2q8nq2/fWms/TrS6P1XU+z+ar1upc2S9b8R6w+qVzXn23bVb0b8Yy5N85tS1zj+o+z/4Qf9+CLb8X86yYp3VtVw6V/cxX2N8fuM+3R5OZeR9rb19F8yVtV8S4m9brq1q7O6vR/ktS4vpH4+o71t93Htkls0eR4OqP3f7vVh9j0/6/uAtnT0eZ7b9Xy62o6fP58l9ubR1g+e3b3m2dcNbqv42Zn9+7k8v7F94hAAAAAAB8q0zKc1i9r7pZ+8N0zG+8J7lZ2tT8x8f0C/9pAfb7v+W6Xx/ceF6+3v7m+4s0H8bFh6AQAAAAAAAAAAAAAAwJ8HLF5bKx8fbbQAAAAASUVORK5CYII=">
-      <h1>Check materiale IT</h1>
-      <div class="sub">Controllo merce per apertura palestra. Interfaccia ottimizzata per touch, kiosk, tablet e desktop.</div>
-      <div class="device" id="deviceLabel">Dispositivo: rilevamento...</div>
+
+<section class="hero">
+  <div>
+    <div class="logo-wrap">
+      <svg class="fit-logo" viewBox="0 0 900 340" role="img" aria-label="FitUP">
+        <rect width="900" height="340" fill="none"/>
+        <text x="35" y="220" font-family="Arial Black, Arial, sans-serif" font-size="170" font-weight="900" fill="#8DC63F">FiT</text>
+        <text x="390" y="220" font-family="Arial Black, Arial, sans-serif" font-size="170" font-weight="900" fill="#FFFFFF">UP</text>
+        <circle cx="650" cy="160" r="125" fill="none" stroke="#FFFFFF" stroke-width="18"/>
+        <path d="M560 70 C610 25,710 35,760 105" fill="none" stroke="#FFFFFF" stroke-width="18" stroke-linecap="round"/>
+      </svg>
     </div>
-    <div class="progress">
-      <div class="pct" id="pct">0%</div>
-      <div class="count" id="count">0 / 0 controllati</div>
-    </div>
-  </section>
 
-  <div class="bar"><div id="bar"></div></div>
-
-  <section class="summary">
-    <div class="stat ok"><small>OK</small><strong id="okCount">0</strong></div>
-    <div class="stat warn"><small>Mancanti</small><strong id="missingCount">0</strong></div>
-    <div class="stat bad"><small>Danneggiati</small><strong id="damagedCount">0</strong></div>
-    <div class="stat pending"><small>Da controllare</small><strong id="pendingCount">0</strong></div>
-  </section>
-
-  <div class="ready" id="readyBanner">✅ Tutto il materiale risulta controllato e conforme.</div>
-
-  <section class="toolbar">
-    <input id="search" placeholder="Cerca materiale">
-    <select id="filter">
-      <option value="all">Tutti</option>
-      <option value="pending">Da controllare</option>
-      <option value="ok">OK</option>
-      <option value="missing">Mancanti</option>
-      <option value="damaged">Danneggiati</option>
-    </select>
-    <button class="btn primary" id="csv">Esporta CSV</button>
-    <button class="btn secondary" id="reset">Reset</button>
-  </section>
-
-  <main class="grid" id="app"></main>
-
-  <div class="footer">
-    <button class="btn light" id="printBtn">Stampa / PDF</button>
-    <button class="btn primary" id="markAllOk">Segna tutto OK</button>
+    <h1>Check materiale IT</h1>
+    <div class="sub">Controllo merce per apertura palestra. Interfaccia FitUP ottimizzata per touch, kiosk, tablet e desktop.</div>
+    <div class="device" id="deviceLabel">Dispositivo: rilevamento...</div>
   </div>
+
+  <div class="progress">
+    <div class="pct" id="pct">0%</div>
+    <div class="count" id="count">0 / 0 controllati</div>
+  </div>
+</section>
+
+<div class="bar"><div id="bar"></div></div>
+
+<section class="summary">
+  <div class="stat ok"><small>OK</small><strong id="okCount">0</strong></div>
+  <div class="stat warn"><small>Mancanti</small><strong id="missingCount">0</strong></div>
+  <div class="stat bad"><small>Danneggiati</small><strong id="damagedCount">0</strong></div>
+  <div class="stat pending"><small>Da controllare</small><strong id="pendingCount">0</strong></div>
+</section>
+
+<div class="ready" id="readyBanner">✅ Tutto il materiale risulta controllato e conforme.</div>
+
+<section class="toolbar">
+  <input id="search" placeholder="Cerca materiale">
+  <select id="filter">
+    <option value="all">Tutti</option>
+    <option value="pending">Da controllare</option>
+    <option value="ok">OK</option>
+    <option value="missing">Mancanti</option>
+    <option value="damaged">Danneggiati</option>
+  </select>
+  <button class="btn primary" id="csv">Esporta CSV</button>
+  <button class="btn secondary" id="reset">Reset</button>
+</section>
+
+<main class="grid" id="app"></main>
+
+<div class="footer">
+  <button class="btn light" id="printBtn">Stampa / PDF</button>
+  <button class="btn primary" id="markAllOk">Segna tutto OK</button>
+</div>
+
 </div>
 
 <script>
@@ -137,7 +528,7 @@ var sections=[
 {icon:"🏗️",title:"Extra",items:["Transpallet manuale","Kit cancelleria"]}
 ];
 
-var key="fitup-check-materiale-v4";
+var key="fitup-check-materiale-v5";
 var state=load();
 
 function load(){try{return JSON.parse(localStorage.getItem(key)||'{"items":{},"notes":{}}')}catch(e){return{items:{},notes:{}}}}
