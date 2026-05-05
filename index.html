@@ -452,7 +452,7 @@ function authErrorMessage(error){
 
 function smartLogin(){
   clearLoginMessages();
-  loginBtn.disabled=true;
+  loginBtn.disabled = true;
   showInfo("Avvio login Google...");
 
   auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
@@ -462,6 +462,35 @@ function smartLogin(){
     .then(function(){
       clearLoginMessages();
     })
+    .catch(function(error){
+
+      console.error("Popup login error:", error);
+
+      var msg = authErrorMessage(error);
+      showError(msg);
+
+      // 👇 SE popup fallisce → fallback automatico redirect
+      var isCritical =
+        error.code === "auth/popup-blocked" ||
+        error.code === "auth/cancelled-popup-request" ||
+        error.code === "auth/internal-error" ||
+        (error.message && error.message.includes("missing initial state")) ||
+        (error.message && error.message.includes("sessionStorage"));
+
+      if(isCritical){
+        showInfo("Browser restrittivo rilevato → login sicuro in corso...");
+        
+        setTimeout(function(){
+          auth.signInWithRedirect(provider());
+        }, 800);
+
+        return;
+      }
+
+      loginBtn.disabled = false;
+      retryRedirectBtn.style.display = "block";
+    });
+}
     .catch(function(error){
       console.error("Popup login error:",error);
       loginBtn.disabled=false;
@@ -507,16 +536,14 @@ auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(function(error){
 
 auth.getRedirectResult()
   .then(function(result){
-    redirectHandled=true;
     if(result && result.user){
       clearLoginMessages();
     }
   })
   .catch(function(error){
-    redirectHandled=true;
-    console.error("Redirect result error:",error);
+    console.error("Redirect result error:", error);
     showError(authErrorMessage(error));
-    retryRedirectBtn.style.display="block";
+    retryRedirectBtn.style.display = "block";
   });
 
 function id(cat,item){return(cat+"__"+item).toLowerCase().replace(/[^a-z0-9]+/g,"-")}
