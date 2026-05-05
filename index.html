@@ -6,29 +6,236 @@
   <title>Check Materiale IT - Apertura Palestra</title>
   <meta name="description" content="Checklist materiale IT per apertura palestra FitUP" />
   <style>
-    :root{--bg:#f4f6f8;--card:#fff;--text:#111827;--muted:#6b7280;--line:#e5e7eb;--brand:#111827;--ok:#16a34a}
+    :root{
+      --bg:#f4f6f8;
+      --card:#ffffff;
+      --text:#111827;
+      --muted:#6b7280;
+      --line:#e5e7eb;
+      --brand:#111827;
+      --ok:#11823b;
+      --ok2:#46b846;
+    }
+
     *{box-sizing:border-box}
-    body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
-    .wrap{max-width:1180px;margin:auto;padding:24px}
-    .hero,.toolbar,.card{background:var(--card);border:1px solid var(--line);border-radius:22px;box-shadow:0 6px 20px rgba(0,0,0,.05)}
-    .hero{padding:24px;margin-bottom:16px;display:flex;gap:20px;justify-content:space-between;align-items:center}
-    h1{margin:6px 0 4px;font-size:34px}.sub{color:var(--muted)}
-    .progress-num{font-size:42px;font-weight:800;text-align:right}.progress-text{text-align:right;color:var(--muted)}
-    .bar{height:12px;background:#eef2f7;border-radius:99px;overflow:hidden;margin:0 0 16px}.bar>div{height:100%;background:var(--brand);width:0%}
-    .toolbar{padding:14px;margin-bottom:16px;display:grid;grid-template-columns:1fr 1fr auto auto;gap:10px}
-    input{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:14px;font-size:14px}
-    button{border:0;border-radius:14px;padding:12px 14px;font-weight:700;cursor:pointer}
-    .primary{background:var(--brand);color:#fff}.secondary{background:#fff;border:1px solid var(--line);color:var(--text)}
-    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
-    .card{padding:18px}.head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-    h2{font-size:18px;margin:0}.badge{font-size:12px;background:#f3f4f6;border-radius:999px;padding:6px 10px;color:var(--muted);font-weight:700}
-    .item{border:1px solid var(--line);border-radius:16px;padding:12px;margin:10px 0;background:#fff}
-    .row{display:flex;gap:10px;align-items:center;cursor:pointer}
-    .box{width:24px;height:24px;border:2px solid #cbd5e1;border-radius:7px;display:grid;place-items:center;flex:0 0 auto;color:white;font-size:16px}
-    .done .box{background:var(--ok);border-color:var(--ok)} .done .name{text-decoration:line-through;color:#9ca3af}
-    .note{margin-top:10px}
-    @media(max-width:800px){.hero{display:block}.progress-num,.progress-text{text-align:left}.toolbar,.grid{grid-template-columns:1fr}h1{font-size:28px}}
-    @media print{.toolbar{display:none}.wrap{padding:0}.hero,.card{box-shadow:none}.grid{grid-template-columns:1fr}}
+
+    body{
+      margin:0;
+      font-family:Arial,Helvetica,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+
+    .wrap{
+      max-width:1180px;
+      margin:auto;
+      padding:24px;
+    }
+
+    .hero,.toolbar,.card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:22px;
+      box-shadow:0 6px 20px rgba(0,0,0,.05);
+    }
+
+    .hero{
+      padding:24px;
+      margin-bottom:16px;
+      display:flex;
+      gap:20px;
+      justify-content:space-between;
+      align-items:center;
+    }
+
+    h1{
+      margin:6px 0 4px;
+      font-size:34px;
+    }
+
+    .sub{
+      color:var(--muted);
+    }
+
+    .progress-num{
+      font-size:42px;
+      font-weight:800;
+      text-align:right;
+    }
+
+    .progress-text{
+      text-align:right;
+      color:var(--muted);
+    }
+
+    .bar{
+      height:12px;
+      background:#eef2f7;
+      border-radius:99px;
+      overflow:hidden;
+      margin:0 0 16px;
+    }
+
+    .bar>div{
+      height:100%;
+      background:var(--brand);
+      width:0%;
+      transition:width .2s ease;
+    }
+
+    .toolbar{
+      padding:14px;
+      margin-bottom:16px;
+      display:grid;
+      grid-template-columns:1fr auto auto;
+      gap:10px;
+    }
+
+    input{
+      width:100%;
+      padding:12px 14px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      font-size:14px;
+    }
+
+    button{
+      border:0;
+      border-radius:14px;
+      padding:12px 14px;
+      font-weight:700;
+      cursor:pointer;
+    }
+
+    .primary{
+      background:var(--brand);
+      color:#fff;
+    }
+
+    .secondary{
+      background:#fff;
+      border:1px solid var(--line);
+      color:var(--text);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:16px;
+    }
+
+    .card{
+      padding:18px;
+    }
+
+    .head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:12px;
+      gap:12px;
+    }
+
+    h2{
+      font-size:18px;
+      margin:0;
+    }
+
+    .badge{
+      font-size:12px;
+      background:#f3f4f6;
+      border-radius:999px;
+      padding:6px 10px;
+      color:var(--muted);
+      font-weight:700;
+      white-space:nowrap;
+    }
+
+    .item{
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:13px;
+      margin:10px 0;
+      background:#fff;
+      transition:background .15s ease,border-color .15s ease,transform .08s ease;
+    }
+
+    .item:active{
+      transform:scale(.995);
+    }
+
+    .row{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      cursor:pointer;
+      user-select:none;
+      -webkit-tap-highlight-color:transparent;
+    }
+
+    .box{
+      width:32px;
+      height:32px;
+      border:2px solid #cbd5e1;
+      border-radius:9px;
+      display:grid;
+      place-items:center;
+      flex:0 0 auto;
+      background:#fff;
+      transition:all .15s ease;
+    }
+
+    .checkmark{
+      width:24px;
+      height:24px;
+      opacity:0;
+      transform:scale(.65);
+      transition:opacity .12s ease,transform .12s ease;
+    }
+
+    .done{
+      border-color:#bbf7d0;
+      background:#f0fdf4;
+    }
+
+    .done .box{
+      border-color:var(--ok);
+      background:#ffffff;
+    }
+
+    .done .checkmark{
+      opacity:1;
+      transform:scale(1);
+    }
+
+    .done .name{
+      color:#15803d;
+      font-weight:800;
+    }
+
+    .name{
+      font-weight:700;
+      line-height:1.25;
+    }
+
+    .note{
+      margin-top:10px;
+    }
+
+    @media(max-width:800px){
+      .hero{display:block}
+      .progress-num,.progress-text{text-align:left}
+      .toolbar,.grid{grid-template-columns:1fr}
+      h1{font-size:28px}
+      .wrap{padding:14px}
+    }
+
+    @media print{
+      .toolbar{display:none}
+      .wrap{padding:0}
+      .hero,.card{box-shadow:none}
+      .grid{grid-template-columns:1fr}
+    }
   </style>
 </head>
 <body>
@@ -37,17 +244,17 @@
       <div>
         <div class="sub">📦 Apertura palestra</div>
         <h1>Check materiale IT</h1>
-        <div class="sub">Spunta il materiale all'arrivo merce. I dati restano salvati nel browser.</div>
+        <div class="sub">Tocca il quadratino per segnare il materiale controllato.</div>
       </div>
       <div>
         <div class="progress-num" id="pct">0%</div>
         <div class="progress-text" id="count">0 / 0 completati</div>
       </div>
     </section>
+
     <div class="bar"><div id="bar"></div></div>
 
     <section class="toolbar">
-      <input id="sede" placeholder="Nome palestra / sede">
       <input id="search" placeholder="Cerca materiale">
       <button class="primary" id="csv">Esporta CSV</button>
       <button class="secondary" id="reset">Reset</button>
@@ -57,76 +264,212 @@
   </div>
 
 <script>
-const sections=[
-["🔧","Materiale tecnico base",["Tornello","Impianto Audio","Rack 19\\"","Patch Panel Rack","Dadi a gabbia per rack (20)","Ripiano Rack (2)","Ciabatta Shuko Rack (2)","Cavo Patch Ethernet 0,5m (3x10)","Cavo Patch Ethernet 1m (3x10)","Hard Disk","NVR Dahua"]],
-["🌐","Networking & alimentazione",["Switch","Switch PoE","UPS","Ubiquiti Unifi (3)"]],
-["📡","Sicurezza & comunicazione",["Telecamere","Staffe per telecamere","Lettori Kughi NFC (2)","Protezione esterna lettore"]],
-["💻","Postazioni & hardware",["PC Desktop (2)","Monitor (2)","Kit tastiera & mouse wireless (2)","Tappetino mouse (2)","Webcam (2)","Tavoletta grafometrica (2)"]],
-["🖨️","Stampa & gestione documenti",["Lettore Tessere e Sanitarie (2)","Lettore Banco RFID (2)","Ciabatta multipresa (2)","Stampante fiscale","Stampante multifunzione","Toner stampante (2)"]],
-["🏋️‍♂️","Sistemi palestra & accessi",["SportTrick Setup","Player Red TV","Licenza Player Red TV","Edision HDMI Modulator 3in mini","Edision SDC-6 Partitore Antenna","Connettori F (10 confezioni da 4)","Cavo coassiale connettore F 1m","Licenza Office (2)"]],
-["📶","Connettività & IoT",["Gigaset IP","iPhone 16e","Hub Ajax","Rex Ajax","Door Protect Ajax (2 per porta)","Pulsante Ajax (2)","Home Siren Ajax","Relay Ajax"]],
-["📺","TV & segnaletica",["Televisore Hisense 75\\"","Televisore Hisense 65\\" (3)","Supporto da parete TV (4)"]],
-["🚨","Cartellonistica",["Cartello Porta Allarmata (2)","Cartello Area Videosorvegliata (3)","Cartello Pulsante Emergenza Ajax (2 o più)","Striscione Lavora con noi"]],
-["🔖","Adesivi Tornello / Accessi",["Adesivo Solo Entrata Tornello","Adesivo Solo Uscita Tornello","Adesivo Solo Emergenza Tornello (se presente sportello bandiera)","Adesivo Solo Staff"]],
-["🏗️","Extra",["Transpallet manuale","Kit cancelleria"]]
+const sections = [
+  {
+    icon: "🔧",
+    title: "Materiale tecnico base",
+    items: [
+      "Tornello",
+      "Impianto Audio",
+      "Rack 19\"",
+      "Patch Panel Rack",
+      "Dadi a gabbia per rack (20)",
+      "Ripiano Rack (2)",
+      "Ciabatta Shuko Rack (2)",
+      "Cavo Patch Ethernet 0,5m (3x10)",
+      "Cavo Patch Ethernet 1m (3x10)",
+      "Hard Disk",
+      "NVR Dahua"
+    ]
+  },
+  {
+    icon: "🌐",
+    title: "Networking & alimentazione",
+    items: ["Switch","Switch PoE","UPS","Ubiquiti Unifi (3)"]
+  },
+  {
+    icon: "📡",
+    title: "Sicurezza & comunicazione",
+    items: ["Telecamere","Staffe per telecamere","Lettori Kughi NFC (2)","Protezione esterna lettore"]
+  },
+  {
+    icon: "💻",
+    title: "Postazioni & hardware",
+    items: ["PC Desktop (2)","Monitor (2)","Kit tastiera & mouse wireless (2)","Tappetino mouse (2)","Webcam (2)","Tavoletta grafometrica (2)"]
+  },
+  {
+    icon: "🖨️",
+    title: "Stampa & gestione documenti",
+    items: ["Lettore Tessere e Sanitarie (2)","Lettore Banco RFID (2)","Ciabatta multipresa (2)","Stampante fiscale","Stampante multifunzione","Toner stampante (2)"]
+  },
+  {
+    icon: "🏋️‍♂️",
+    title: "Sistemi palestra & accessi",
+    items: ["SportTrick Setup","Player Red TV","Licenza Player Red TV","Edision HDMI Modulator 3in mini","Edision SDC-6 Partitore Antenna","Connettori F (10 confezioni da 4)","Cavo coassiale connettore F 1m","Licenza Office (2)"]
+  },
+  {
+    icon: "📶",
+    title: "Connettività & IoT",
+    items: ["Gigaset IP","iPhone 16e","Hub Ajax","Rex Ajax","Door Protect Ajax (2 per porta)","Pulsante Ajax (2)","Home Siren Ajax","Relay Ajax"]
+  },
+  {
+    icon: "📺",
+    title: "TV & segnaletica",
+    items: ["Televisore Hisense 75\"","Televisore Hisense 65\" (3)","Supporto da parete TV (4)"]
+  },
+  {
+    icon: "🚨",
+    title: "Cartellonistica",
+    items: ["Cartello Porta Allarmata (2)","Cartello Area Videosorvegliata (3)","Cartello Pulsante Emergenza Ajax (2 o più)","Striscione Lavora con noi"]
+  },
+  {
+    icon: "🔖",
+    title: "Adesivi Tornello / Accessi",
+    items: ["Adesivo Solo Entrata Tornello","Adesivo Solo Uscita Tornello","Adesivo Solo Emergenza Tornello (se presente sportello bandiera)","Adesivo Solo Staff"]
+  },
+  {
+    icon: "🏗️",
+    title: "Extra",
+    items: ["Transpallet manuale","Kit cancelleria"]
+  }
 ];
 
-const key="fitup-check-materiale-v1";
-let state=JSON.parse(localStorage.getItem(key)||'{"checked":{},"notes":{},"sede":""}');
-const id=(cat,item)=>(cat+"__"+item).toLowerCase().replace(/[^a-z0-9]+/g,"-");
-const all=()=>sections.flatMap(s=>s[2].map(i=>({icon:s[0],cat:s[1],item:i,id:id(s[1],i)})));
+const storageKey = "fitup-check-materiale-v2";
+let state = JSON.parse(localStorage.getItem(storageKey) || '{"checked":{},"notes":{}}');
+
+function makeId(category, item){
+  return (category + "__" + item).toLowerCase().replace(/[^a-z0-9]+/g, "-");
+}
+
+function allItems(){
+  return sections.flatMap(section => section.items.map(item => ({
+    category: section.title,
+    item: item,
+    id: makeId(section.title, item)
+  })));
+}
 
 function save(){
-  state.sede=document.getElementById("sede").value;
-  localStorage.setItem(key,JSON.stringify(state));
+  localStorage.setItem(storageKey, JSON.stringify(state));
+}
+
+function tickSvg(){
+  return `
+    <svg class="checkmark" viewBox="0 0 1024 1024" aria-hidden="true">
+      <defs>
+        <linearGradient id="tickGradient" x1="0" y1="1" x2="1" y2="0">
+          <stop offset="0%" stop-color="#047857"></stop>
+          <stop offset="100%" stop-color="#4ade80"></stop>
+        </linearGradient>
+      </defs>
+      <path fill="url(#tickGradient)" d="M400.5 744.1c-35.6 0-67.9-20.5-83.1-52.8L205.2 452.7c-21.6-45.9-1.9-100.6 44-122.2 45.9-21.6 100.6-1.9 122.2 44l44.5 94.6L642.6 160.5c30-40.9 87.5-49.7 128.4-19.7 40.9 30 49.7 87.5 19.7 128.4L474.6 699.9c-17.3 23.6-44.8 37.6-74.1 44.2z"/>
+    </svg>
+  `;
 }
 
 function render(){
-  const q=document.getElementById("search").value.toLowerCase();
-  const app=document.getElementById("app");
-  app.innerHTML="";
-  sections.forEach(([icon,cat,items])=>{
-    const shown=items.filter(item=>(cat+" "+item).toLowerCase().includes(q));
-    if(!shown.length)return;
-    const done=shown.filter(item=>state.checked[id(cat,item)]).length;
-    const card=document.createElement("section");
-    card.className="card";
-    card.innerHTML=`<div class="head"><h2>${icon} ${cat}</h2><span class="badge">${done}/${shown.length}</span></div>`;
-    shown.forEach(item=>{
-      const itemId=id(cat,item), isDone=!!state.checked[itemId];
-      const div=document.createElement("div");
-      div.className="item"+(isDone?" done":"");
-      div.innerHTML=`<div class="row"><span class="box">${isDone?"✓":""}</span><strong class="name">${item}</strong></div><input class="note" placeholder="Note opzionali" value="${(state.notes[itemId]||"").replaceAll('"',"&quot;")}">`;
-      div.querySelector(".row").onclick=()=>{state.checked[itemId]=!state.checked[itemId];save();render()};
-      div.querySelector(".note").oninput=e=>{state.notes[itemId]=e.target.value;save()};
+  const query = document.getElementById("search").value.toLowerCase();
+  const app = document.getElementById("app");
+  app.innerHTML = "";
+
+  sections.forEach(section => {
+    const shown = section.items.filter(item =>
+      (section.title + " " + item).toLowerCase().includes(query)
+    );
+
+    if(!shown.length) return;
+
+    const done = shown.filter(item => state.checked[makeId(section.title, item)]).length;
+    const card = document.createElement("section");
+    card.className = "card";
+    card.innerHTML = `
+      <div class="head">
+        <h2>${section.icon} ${section.title}</h2>
+        <span class="badge">${done}/${shown.length}</span>
+      </div>
+    `;
+
+    shown.forEach(item => {
+      const itemId = makeId(section.title, item);
+      const isDone = Boolean(state.checked[itemId]);
+      const div = document.createElement("div");
+      div.className = "item" + (isDone ? " done" : "");
+
+      div.innerHTML = `
+        <div class="row" role="button" tabindex="0" aria-pressed="${isDone}">
+          <span class="box">${tickSvg()}</span>
+          <strong class="name">${item}</strong>
+        </div>
+        <input class="note" placeholder="Note opzionali" value="${(state.notes[itemId] || "").replaceAll('"', "&quot;")}">
+      `;
+
+      const toggle = () => {
+        state.checked[itemId] = !state.checked[itemId];
+        save();
+        render();
+      };
+
+      const row = div.querySelector(".row");
+      row.onclick = toggle;
+      row.onkeydown = (event) => {
+        if(event.key === "Enter" || event.key === " "){
+          event.preventDefault();
+          toggle();
+        }
+      };
+
+      div.querySelector(".note").oninput = event => {
+        state.notes[itemId] = event.target.value;
+        save();
+      };
+
       card.appendChild(div);
     });
+
     app.appendChild(card);
   });
-  const items=all(), completed=items.filter(x=>state.checked[x.id]).length, total=items.length, pct=Math.round(completed/total*100);
-  document.getElementById("pct").textContent=pct+"%";
-  document.getElementById("count").textContent=`${completed} / ${total} completati`;
-  document.getElementById("bar").style.width=pct+"%";
+
+  const items = allItems();
+  const completed = items.filter(item => state.checked[item.id]).length;
+  const total = items.length;
+  const pct = total ? Math.round((completed / total) * 100) : 0;
+
+  document.getElementById("pct").textContent = pct + "%";
+  document.getElementById("count").textContent = completed + " / " + total + " completati";
+  document.getElementById("bar").style.width = pct + "%";
 }
 
-document.getElementById("sede").value=state.sede||"";
-document.getElementById("sede").oninput=save;
-document.getElementById("search").oninput=render;
-document.getElementById("reset").onclick=()=>{
+document.getElementById("search").oninput = render;
+
+document.getElementById("reset").onclick = () => {
   if(confirm("Azzerare tutti i check e le note?")){
-    state={checked:{},notes:{},sede:document.getElementById("sede").value};
+    state = {checked:{}, notes:{}};
     save();
     render();
   }
 };
-document.getElementById("csv").onclick=()=>{
-  const rows=[["Sede","Categoria","Materiale","Arrivato","Note"]];
-  all().forEach(x=>rows.push([document.getElementById("sede").value,x.cat,x.item,state.checked[x.id]?"SI":"NO",state.notes[x.id]||""]));
-  const csv=rows.map(r=>r.map(c=>`"${String(c).replaceAll('"','""')}"`).join(",")).join("\n");
-  const blob=new Blob([csv],{type:"text/csv;charset=utf-8"}), url=URL.createObjectURL(blob), a=document.createElement("a");
-  a.href=url;
-  a.download="check-materiale-"+(document.getElementById("sede").value||"palestra")+".csv";
-  a.click();
+
+document.getElementById("csv").onclick = () => {
+  const rows = [["Categoria","Materiale","Controllato","Note"]];
+  allItems().forEach(item => {
+    rows.push([
+      item.category,
+      item.item,
+      state.checked[item.id] ? "SI" : "NO",
+      state.notes[item.id] || ""
+    ]);
+  });
+
+  const csv = rows
+    .map(row => row.map(cell => '"' + String(cell).replaceAll('"','""') + '"').join(","))
+    .join("\n");
+
+  const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "check-materiale-apertura-palestra.csv";
+  link.click();
   URL.revokeObjectURL(url);
 };
 
