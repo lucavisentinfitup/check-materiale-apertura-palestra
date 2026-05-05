@@ -451,17 +451,19 @@ function authErrorMessage(error){
 }
 
 function smartLogin(){
+
   clearLoginMessages();
+
   loginBtn.disabled = true;
+
   showInfo("Avvio login Google...");
 
-  auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-    .then(function(){
-      return auth.signInWithPopup(provider());
-    })
+  auth.signInWithPopup(provider())
+
     .then(function(){
       clearLoginMessages();
     })
+
     .catch(function(error){
 
       console.error("Popup login error:", error);
@@ -469,7 +471,6 @@ function smartLogin(){
       var msg = authErrorMessage(error);
       showError(msg);
 
-      // 👇 SE popup fallisce → fallback automatico redirect
       var isCritical =
         error.code === "auth/popup-blocked" ||
         error.code === "auth/cancelled-popup-request" ||
@@ -478,38 +479,20 @@ function smartLogin(){
         (error.message && error.message.includes("sessionStorage"));
 
       if(isCritical){
-        showInfo("Browser restrittivo rilevato → login sicuro in corso...");
+        showInfo("Browser restrittivo → login sicuro...");
         
         setTimeout(function(){
           auth.signInWithRedirect(provider());
-        }, 800);
+        }, 500);
 
         return;
       }
 
       loginBtn.disabled = false;
       retryRedirectBtn.style.display = "block";
-    });
-}
-    .catch(function(error){
-      console.error("Popup login error:",error);
-      loginBtn.disabled=false;
-      showError(authErrorMessage(error));
-      retryRedirectBtn.style.display="block";
 
-      var code=error && error.code ? error.code : "";
-      var msg=error && error.message ? error.message : "";
-      var shouldRedirect =
-        code==="auth/popup-blocked" ||
-        code==="auth/cancelled-popup-request" ||
-        code==="auth/internal-error" ||
-        msg.indexOf("missing initial state")!==-1 ||
-        msg.indexOf("sessionStorage")!==-1;
-
-      if(shouldRedirect){
-        showInfo("Tentativo popup non disponibile. Premi “Riprova con login sicuro” per usare il redirect.");
-      }
     });
+
 }
 
 function redirectLogin(){
