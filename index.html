@@ -1,866 +1,212 @@
 <!doctype html>
 <html lang="it">
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="description" content="Checklist materiale IT per apertura palestra FitUP">
-  <meta name="theme-color" content="#111827">
-  <title>Check Materiale IT - Apertura Palestra</title>
-
-  <style>
-    :root{
-      --bg:#f4f6f8;
-      --card:#ffffff;
-      --text:#111827;
-      --muted:#6b7280;
-      --line:#e5e7eb;
-      --brand:#111827;
-      --ok:#16a34a;
-      --warn:#f59e0b;
-      --bad:#dc2626;
-      --pending:#94a3b8;
-      --soft-ok:#f0fdf4;
-      --soft-warn:#fffbeb;
-      --soft-bad:#fef2f2;
-      --shadow:0 6px 20px rgba(0,0,0,.06);
-      --radius:22px;
-      --tap:48px;
-    }
-
-    *{box-sizing:border-box}
-
-    html{
-      -webkit-text-size-adjust:100%;
-      text-size-adjust:100%;
-    }
-
-    body{
-      margin:0;
-      font-family:Arial, Helvetica, sans-serif;
-      background:var(--bg);
-      color:var(--text);
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-    }
-
-    button,input,select,textarea{
-      font-family:inherit;
-      font-size:16px;
-    }
-
-    button{
-      min-height:var(--tap);
-      touch-action:manipulation;
-    }
-
-    .wrap{
-      max-width:1280px;
-      margin:0 auto;
-      padding:20px;
-    }
-
-    .hero,.toolbar,.card,.summary-card{
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-    }
-
-    .hero{
-      padding:22px;
-      margin-bottom:14px;
-      display:flex;
-      gap:20px;
-      justify-content:space-between;
-      align-items:center;
-    }
-
-    .eyebrow{
-      color:var(--muted);
-      font-weight:700;
-      font-size:14px;
-    }
-
-    h1{
-      margin:8px 0 6px;
-      font-size:34px;
-      line-height:1.05;
-    }
-
-    .sub{
-      color:var(--muted);
-      line-height:1.4;
-    }
-
-    .device-pill{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      margin-top:12px;
-      padding:8px 12px;
-      border-radius:999px;
-      background:#f3f4f6;
-      color:#374151;
-      font-weight:700;
-      font-size:13px;
-    }
-
-    .progress-box{
-      text-align:right;
-      min-width:170px;
-    }
-
-    .progress-num{
-      font-size:44px;
-      font-weight:900;
-      line-height:1;
-    }
-
-    .progress-text{
-      margin-top:6px;
-      color:var(--muted);
-      font-weight:700;
-    }
-
-    .bar{
-      height:12px;
-      background:#e9eef5;
-      border-radius:999px;
-      overflow:hidden;
-      margin-bottom:14px;
-    }
-
-    .bar > div{
-      height:100%;
-      width:0%;
-      background:var(--brand);
-      transition:width .2s ease;
-    }
-
-    .summary{
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:12px;
-      margin-bottom:14px;
-    }
-
-    .summary-card{
-      padding:14px;
-      min-height:84px;
-    }
-
-    .summary-label{
-      color:var(--muted);
-      font-size:13px;
-      font-weight:700;
-    }
-
-    .summary-value{
-      margin-top:6px;
-      font-size:28px;
-      font-weight:900;
-    }
-
-    .summary-card.ok .summary-value{color:var(--ok)}
-    .summary-card.warn .summary-value{color:var(--warn)}
-    .summary-card.bad .summary-value{color:var(--bad)}
-    .summary-card.pending .summary-value{color:var(--pending)}
-
-    .toolbar{
-      padding:14px;
-      margin-bottom:16px;
-      display:grid;
-      grid-template-columns:1fr 190px 150px 150px;
-      gap:10px;
-      align-items:center;
-    }
-
-    input,select{
-      width:100%;
-      min-height:var(--tap);
-      border:1px solid var(--line);
-      border-radius:15px;
-      background:#fff;
-      color:var(--text);
-      padding:12px 14px;
-      outline:none;
-    }
-
-    input:focus,select:focus{
-      border-color:#111827;
-      box-shadow:0 0 0 3px rgba(17,24,39,.12);
-    }
-
-    .btn{
-      border:0;
-      border-radius:15px;
-      padding:12px 14px;
-      font-weight:900;
-      cursor:pointer;
-      transition:transform .06s ease, opacity .15s ease;
-      white-space:nowrap;
-    }
-
-    .btn:active{transform:scale(.98)}
-    .btn-primary{background:var(--brand);color:#fff}
-    .btn-secondary{background:#fff;border:1px solid var(--line);color:var(--text)}
-    .btn-ok{background:var(--ok);color:#fff}
-    .btn-warn{background:var(--warn);color:#111827}
-    .btn-bad{background:var(--bad);color:#fff}
-    .btn-ghost{background:#f3f4f6;color:#111827}
-
-    .ready-banner{
-      display:none;
-      margin-bottom:16px;
-      padding:16px;
-      border-radius:20px;
-      background:#dcfce7;
-      border:1px solid #86efac;
-      color:#166534;
-      font-weight:900;
-      text-align:center;
-    }
-
-    .ready-banner.show{display:block}
-
-    .grid{
-      display:grid;
-      grid-template-columns:repeat(2,minmax(0,1fr));
-      gap:16px;
-    }
-
-    .card{
-      padding:18px;
-    }
-
-    .head{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
-      margin-bottom:12px;
-    }
-
-    h2{
-      margin:0;
-      font-size:18px;
-      line-height:1.2;
-    }
-
-    .badge{
-      border-radius:999px;
-      background:#f3f4f6;
-      padding:7px 11px;
-      color:#475569;
-      font-size:12px;
-      font-weight:900;
-      white-space:nowrap;
-    }
-
-    .item{
-      border:1px solid var(--line);
-      border-radius:18px;
-      padding:13px;
-      margin:10px 0;
-      background:#fff;
-      transition:background .15s ease,border-color .15s ease,transform .08s ease;
-    }
-
-    .item:active{transform:scale(.997)}
-    .item.status-ok{background:var(--soft-ok);border-color:#86efac}
-    .item.status-missing{background:var(--soft-warn);border-color:#fcd34d}
-    .item.status-damaged{background:var(--soft-bad);border-color:#fca5a5}
-
-    .item-main{
-      display:flex;
-      gap:12px;
-      align-items:flex-start;
-    }
-
-    .check-button{
-      width:36px;
-      height:36px;
-      min-height:36px;
-      padding:0;
-      border:2px solid #cbd5e1;
-      border-radius:10px;
-      background:#fff;
-      flex:0 0 auto;
-      display:grid;
-      place-items:center;
-      cursor:pointer;
-    }
-
-    .check-button svg{
-      width:28px;
-      height:28px;
-      opacity:0;
-      transform:scale(.65);
-      transition:opacity .12s ease, transform .12s ease;
-    }
-
-    .status-ok .check-button{
-      border-color:var(--ok);
-    }
-
-    .status-ok .check-button svg{
-      opacity:1;
-      transform:scale(1);
-    }
-
-    .item-body{
-      flex:1;
-      min-width:0;
-    }
-
-    .name{
-      font-weight:900;
-      line-height:1.28;
-      word-break:break-word;
-    }
-
-    .status-ok .name{color:#15803d}
-    .status-missing .name{color:#92400e}
-    .status-damaged .name{color:#991b1b}
-
-    .status-actions{
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:8px;
-      margin-top:12px;
-    }
-
-    .status-btn{
-      min-height:40px;
-      border-radius:12px;
-      border:1px solid var(--line);
-      background:#fff;
-      font-size:13px;
-      font-weight:900;
-      cursor:pointer;
-      padding:8px;
-    }
-
-    .status-btn.active-ok{background:var(--ok);color:#fff;border-color:var(--ok)}
-    .status-btn.active-missing{background:var(--warn);color:#111827;border-color:var(--warn)}
-    .status-btn.active-damaged{background:var(--bad);color:#fff;border-color:var(--bad)}
-    .status-btn.active-pending{background:#475569;color:#fff;border-color:#475569}
-
-    .note{
-      margin-top:10px;
-      display:none;
-    }
-
-    .needs-note .note{
-      display:block;
-    }
-
-    .note-warning{
-      display:none;
-      margin-top:7px;
-      color:#b45309;
-      font-size:12px;
-      font-weight:900;
-    }
-
-    .needs-note.note-empty .note-warning{
-      display:block;
-    }
-
-    .footer-actions{
-      margin-top:20px;
-      display:flex;
-      gap:10px;
-      justify-content:flex-end;
-      flex-wrap:wrap;
-    }
-
-    .hidden{display:none!important}
-
-    body.device-mobile .wrap{padding:12px}
-    body.device-mobile .hero{display:block;padding:18px}
-    body.device-mobile .progress-box{text-align:left;margin-top:16px}
-    body.device-mobile .progress-num{text-align:left;font-size:38px}
-    body.device-mobile .progress-text{text-align:left}
-    body.device-mobile .summary{grid-template-columns:repeat(2,1fr)}
-    body.device-mobile .toolbar{grid-template-columns:1fr}
-    body.device-mobile .grid{grid-template-columns:1fr}
-    body.device-mobile h1{font-size:28px}
-    body.device-mobile .status-actions{grid-template-columns:repeat(2,1fr)}
-    body.device-mobile .btn{width:100%}
-
-    body.device-tablet .grid{grid-template-columns:repeat(2,1fr)}
-    body.device-tablet .toolbar{grid-template-columns:1fr 180px 140px 140px}
-    body.device-tablet .status-actions{grid-template-columns:repeat(4,1fr)}
-
-    body.device-kiosk{
-      --tap:58px;
-    }
-
-    body.device-kiosk .wrap{
-      max-width:1500px;
-      padding:28px;
-    }
-
-    body.device-kiosk h1{
-      font-size:42px;
-    }
-
-    body.device-kiosk .grid{
-      grid-template-columns:repeat(3,minmax(0,1fr));
-    }
-
-    body.device-kiosk .item{
-      padding:16px;
-    }
-
-    body.device-kiosk .name{
-      font-size:18px;
-    }
-
-    body.device-kiosk .check-button{
-      width:44px;
-      height:44px;
-      min-height:44px;
-    }
-
-    @media(max-width:900px){
-      .wrap{padding:14px}
-      .hero{display:block}
-      .progress-box{text-align:left;margin-top:16px}
-      .progress-num,.progress-text{text-align:left}
-      .summary{grid-template-columns:repeat(2,1fr)}
-      .toolbar{grid-template-columns:1fr}
-      .grid{grid-template-columns:1fr}
-      h1{font-size:28px}
-      .status-actions{grid-template-columns:repeat(2,1fr)}
-    }
-
-    @media(min-width:1400px){
-      .grid{grid-template-columns:repeat(3,minmax(0,1fr))}
-    }
-
-    @media print{
-      body{background:#fff}
-      .toolbar,.footer-actions,.status-actions,.note{display:none!important}
-      .wrap{padding:0;max-width:none}
-      .hero,.summary-card,.card{box-shadow:none;border-color:#ddd}
-      .grid{grid-template-columns:1fr}
-      .bar{border:1px solid #ddd}
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>FitUP - Check Materiale IT</title>
+<style>
+:root{
+  --fit-green:#8DC63F;
+  --fit-black:#1D1D1B;
+  --fit-white:#FFFFFF;
+  --bg:#f3f5f1;
+  --card:#ffffff;
+  --text:#1D1D1B;
+  --muted:#6b7280;
+  --line:#dfe6d8;
+  --ok:#8DC63F;
+  --warn:#f59e0b;
+  --bad:#dc2626;
+  --pending:#94a3b8;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(180deg,var(--fit-black) 0, var(--fit-black) 250px, var(--bg) 250px);color:var(--text)}
+button,input,select{font-family:inherit;font-size:16px}
+.wrap{max-width:1280px;margin:auto;padding:22px}
+.hero{background:var(--fit-black);color:var(--fit-white);border:1px solid rgba(255,255,255,.12);border-radius:28px;padding:24px;display:flex;justify-content:space-between;gap:20px;box-shadow:0 16px 40px rgba(0,0,0,.28)}
+.logo{height:72px;max-width:210px;object-fit:contain}
+.hero h1{margin:12px 0 6px;font-size:38px;line-height:1}
+.sub{color:rgba(255,255,255,.75)}
+.device{display:inline-block;margin-top:12px;padding:8px 12px;border-radius:999px;background:rgba(141,198,63,.14);color:var(--fit-green);font-weight:900}
+.progress{text-align:right;min-width:180px}
+.pct{font-size:48px;font-weight:900;color:var(--fit-green)}
+.count{color:rgba(255,255,255,.75);font-weight:800}
+.bar{height:14px;background:rgba(255,255,255,.18);border-radius:99px;overflow:hidden;margin:16px 0}
+.bar div{height:100%;width:0;background:linear-gradient(90deg,#8DC63F,#b6e96e);transition:.2s}
+.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;box-shadow:0 8px 24px rgba(0,0,0,.07)}
+.stat small{color:var(--muted);font-weight:900}
+.stat strong{display:block;margin-top:8px;font-size:30px}
+.stat.ok strong{color:var(--ok)}.stat.warn strong{color:var(--warn)}.stat.bad strong{color:var(--bad)}.stat.pending strong{color:var(--pending)}
+.toolbar{background:#fff;border:1px solid var(--line);border-radius:22px;padding:14px;margin-bottom:16px;display:grid;grid-template-columns:1fr 190px 150px 150px;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,.07)}
+input,select{width:100%;min-height:50px;border:1px solid var(--line);border-radius:16px;padding:12px 14px;background:#fff}
+.btn{border:0;border-radius:16px;min-height:50px;padding:12px 14px;font-weight:900;cursor:pointer}
+.primary{background:var(--fit-green);color:var(--fit-black)}
+.secondary{background:var(--fit-black);color:#fff}
+.light{background:#fff;border:1px solid var(--line);color:var(--fit-black)}
+.ready{display:none;background:#e7f7d9;border:1px solid var(--fit-green);color:#355d12;border-radius:20px;padding:16px;margin-bottom:16px;text-align:center;font-weight:900}
+.ready.show{display:block}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.card{background:#fff;border:1px solid var(--line);border-radius:24px;padding:18px;box-shadow:0 8px 24px rgba(0,0,0,.07)}
+.head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+h2{margin:0;font-size:18px}.badge{background:#edf6e4;color:#355d12;border-radius:999px;padding:7px 11px;font-size:12px;font-weight:900}
+.item{border:1px solid var(--line);border-radius:18px;padding:13px;margin:10px 0;background:#fff}
+.item.ok{background:#f1f9e9;border-color:var(--fit-green)}
+.item.missing{background:#fff7e6;border-color:#f59e0b}
+.item.damaged{background:#fff0f0;border-color:#dc2626}
+.main{display:flex;gap:12px;align-items:flex-start}
+.check{width:38px;height:38px;min-width:38px;border:2px solid #cbd5e1;border-radius:11px;background:#fff;display:grid;place-items:center;cursor:pointer}
+.check svg{width:30px;height:30px;opacity:0;transform:scale(.65);transition:.12s}
+.ok .check{border-color:var(--fit-green)}
+.ok .check svg{opacity:1;transform:scale(1)}
+.name{font-weight:900;line-height:1.25}.ok .name{color:#4b7d12}.missing .name{color:#92400e}.damaged .name{color:#991b1b}
+.actions{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+.actions button{border:1px solid var(--line);background:#fff;border-radius:12px;min-height:42px;font-weight:900;cursor:pointer}
+.actions .a-pending{background:#475569;color:#fff}
+.actions .a-ok{background:var(--fit-green);color:var(--fit-black);border-color:var(--fit-green)}
+.actions .a-missing{background:#f59e0b;color:#111827;border-color:#f59e0b}
+.actions .a-damaged{background:#dc2626;color:#fff;border-color:#dc2626}
+.note{display:none;margin-top:10px}.missing .note,.damaged .note{display:block}
+.footer{display:flex;justify-content:flex-end;gap:10px;margin-top:18px;flex-wrap:wrap}
+@media(max-width:900px){.wrap{padding:12px}.hero{display:block}.progress{text-align:left;margin-top:18px}.summary{grid-template-columns:repeat(2,1fr)}.toolbar,.grid{grid-template-columns:1fr}.hero h1{font-size:30px}.actions{grid-template-columns:repeat(2,1fr)}.btn{width:100%}}
+@media(min-width:1450px){.grid{grid-template-columns:repeat(3,1fr)}}
+@media print{body{background:#fff}.toolbar,.footer,.actions,.note,.device{display:none}.hero,.card,.stat{box-shadow:none}.grid{grid-template-columns:1fr}}
+</style>
 </head>
 
 <body>
-  <div class="wrap">
-    <section class="hero">
-      <div>
-        <div class="eyebrow">📦 Apertura palestra</div>
-        <h1>Check materiale IT</h1>
-        <div class="sub">Tocca il quadratino per segnare OK, oppure usa gli stati Mancante/Danneggiato.</div>
-        <div class="device-pill" id="deviceLabel">Dispositivo: rilevamento...</div>
-      </div>
-
-      <div class="progress-box">
-        <div class="progress-num" id="pct">0%</div>
-        <div class="progress-text" id="count">0 / 0 completati</div>
-      </div>
-    </section>
-
-    <div class="bar"><div id="bar"></div></div>
-
-    <section class="summary">
-      <div class="summary-card ok">
-        <div class="summary-label">OK</div>
-        <div class="summary-value" id="okCount">0</div>
-      </div>
-      <div class="summary-card warn">
-        <div class="summary-label">Mancanti</div>
-        <div class="summary-value" id="missingCount">0</div>
-      </div>
-      <div class="summary-card bad">
-        <div class="summary-label">Danneggiati</div>
-        <div class="summary-value" id="damagedCount">0</div>
-      </div>
-      <div class="summary-card pending">
-        <div class="summary-label">Da controllare</div>
-        <div class="summary-value" id="pendingCount">0</div>
-      </div>
-    </section>
-
-    <div class="ready-banner" id="readyBanner">
-      ✅ Tutto il materiale risulta controllato e conforme.
+<div class="wrap">
+  <section class="hero">
+    <div>
+      <img class="logo" alt="FitUP" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAAB4CAMAAAB/yz8SAAAAQlBMVEVHcEz///////////////////////+RwCbW57P///////////+QwCaRwCb///+RwCaRwCb///////+RwCb///+RwCYMYurFAAAAFXRSTlMAKNP++s+JqSvMchhIVq0kS0K8m+CG3xU7AAABcElEQVR4nO3Y2W6DMAwFUGuCwJaU9v//bQ9KoU6h0Qy9Qpk+zOieVxYcgB9AMAwAAAAAAAAAAAAAAAD4J8rYfbM+q7pYz7L+qfVqaE4xk6b30+xl+VdXy8vXo7XXlMbrV5Y9+8K2q8nq2/fWms/TrS6P1XU+z+ar1upc2S9b8R6w+qVzXn23bVb0b8Yy5N85tS1zj+o+z/4Qf9+CLb8X86yYp3VtVw6V/cxX2N8fuM+3R5OZeR9rb19F8yVtV8S4m9brq1q7O6vR/ktS4vpH4+o71t93Htkls0eR4OqP3f7vVh9j0/6/uAtnT0eZ7b9Xy62o6fP58l9ubR1g+e3b3m2dcNbqv42Zn9+7k8v7F94hAAAAAAB8q0zKc1i9r7pZ+8N0zG+8J7lZ2tT8x8f0C/9pAfb7v+W6Xx/ceF6+3v7m+4s0H8bFh6AQAAAAAAAAAAAAAAwJ8HLF5bKx8fbbQAAAAASUVORK5CYII=">
+      <h1>Check materiale IT</h1>
+      <div class="sub">Controllo merce per apertura palestra. Interfaccia ottimizzata per touch, kiosk, tablet e desktop.</div>
+      <div class="device" id="deviceLabel">Dispositivo: rilevamento...</div>
     </div>
-
-    <section class="toolbar">
-      <input id="search" placeholder="Cerca materiale">
-      <select id="filter">
-        <option value="all">Tutti</option>
-        <option value="pending">Da controllare</option>
-        <option value="ok">OK</option>
-        <option value="missing">Mancanti</option>
-        <option value="damaged">Danneggiati</option>
-      </select>
-      <button class="btn btn-primary" id="csv">Esporta CSV</button>
-      <button class="btn btn-secondary" id="reset">Reset</button>
-    </section>
-
-    <main class="grid" id="app"></main>
-
-    <div class="footer-actions">
-      <button class="btn btn-secondary" id="printBtn">Stampa / PDF</button>
-      <button class="btn btn-ok" id="markAllOk">Segna tutto OK</button>
+    <div class="progress">
+      <div class="pct" id="pct">0%</div>
+      <div class="count" id="count">0 / 0 controllati</div>
     </div>
+  </section>
+
+  <div class="bar"><div id="bar"></div></div>
+
+  <section class="summary">
+    <div class="stat ok"><small>OK</small><strong id="okCount">0</strong></div>
+    <div class="stat warn"><small>Mancanti</small><strong id="missingCount">0</strong></div>
+    <div class="stat bad"><small>Danneggiati</small><strong id="damagedCount">0</strong></div>
+    <div class="stat pending"><small>Da controllare</small><strong id="pendingCount">0</strong></div>
+  </section>
+
+  <div class="ready" id="readyBanner">✅ Tutto il materiale risulta controllato e conforme.</div>
+
+  <section class="toolbar">
+    <input id="search" placeholder="Cerca materiale">
+    <select id="filter">
+      <option value="all">Tutti</option>
+      <option value="pending">Da controllare</option>
+      <option value="ok">OK</option>
+      <option value="missing">Mancanti</option>
+      <option value="damaged">Danneggiati</option>
+    </select>
+    <button class="btn primary" id="csv">Esporta CSV</button>
+    <button class="btn secondary" id="reset">Reset</button>
+  </section>
+
+  <main class="grid" id="app"></main>
+
+  <div class="footer">
+    <button class="btn light" id="printBtn">Stampa / PDF</button>
+    <button class="btn primary" id="markAllOk">Segna tutto OK</button>
   </div>
+</div>
 
 <script>
 (function(){
-  "use strict";
+var sections=[
+{icon:"🔧",title:"Materiale tecnico base",items:["Tornello","Impianto Audio","Rack 19\"","Patch Panel Rack","Dadi a gabbia per rack (20)","Ripiano Rack (2)","Ciabatta Shuko Rack (2)","Cavo Patch Ethernet 0,5m (3x10)","Cavo Patch Ethernet 1m (3x10)","Hard Disk","NVR Dahua"]},
+{icon:"🌐",title:"Networking & alimentazione",items:["Switch","Switch PoE","UPS","Ubiquiti Unifi (3)"]},
+{icon:"📡",title:"Sicurezza & comunicazione",items:["Telecamere","Staffe per telecamere","Lettori Kughi NFC (2)","Protezione esterna lettore"]},
+{icon:"💻",title:"Postazioni & hardware",items:["PC Desktop (2)","Monitor (2)","Kit tastiera & mouse wireless (2)","Tappetino mouse (2)","Webcam (2)","Tavoletta grafometrica (2)"]},
+{icon:"🖨️",title:"Stampa & gestione documenti",items:["Lettore Tessere e Sanitarie (2)","Lettore Banco RFID (2)","Ciabatta multipresa (2)","Stampante fiscale","Stampante multifunzione","Toner stampante (2)"]},
+{icon:"🏋️‍♂️",title:"Sistemi palestra & accessi",items:["SportTrick Setup","Player Red TV","Licenza Player Red TV","Edision HDMI Modulator 3in mini","Edision SDC-6 Partitore Antenna","Connettori F (10 confezioni da 4)","Cavo coassiale connettore F 1m","Licenza Office (2)"]},
+{icon:"📶",title:"Connettività & IoT",items:["Gigaset IP","iPhone 16e","Hub Ajax","Rex Ajax","Door Protect Ajax (2 per porta)","Pulsante Ajax (2)","Home Siren Ajax","Relay Ajax"]},
+{icon:"📺",title:"TV & segnaletica",items:["Televisore Hisense 75\"","Televisore Hisense 65\" (3)","Supporto da parete TV (4)"]},
+{icon:"🚨",title:"Cartellonistica",items:["Cartello Porta Allarmata (2)","Cartello Area Videosorvegliata (3)","Cartello Pulsante Emergenza Ajax (2 o più)","Striscione Lavora con noi"]},
+{icon:"🔖",title:"Adesivi Tornello / Accessi",items:["Adesivo Solo Entrata Tornello","Adesivo Solo Uscita Tornello","Adesivo Solo Emergenza Tornello (se presente sportello bandiera)","Adesivo Solo Staff"]},
+{icon:"🏗️",title:"Extra",items:["Transpallet manuale","Kit cancelleria"]}
+];
 
-  var sections = [
-    {icon:"🔧", title:"Materiale tecnico base", items:[
-      "Tornello","Impianto Audio","Rack 19\"","Patch Panel Rack","Dadi a gabbia per rack (20)",
-      "Ripiano Rack (2)","Ciabatta Shuko Rack (2)","Cavo Patch Ethernet 0,5m (3x10)",
-      "Cavo Patch Ethernet 1m (3x10)","Hard Disk","NVR Dahua"
-    ]},
-    {icon:"🌐", title:"Networking & alimentazione", items:[
-      "Switch","Switch PoE","UPS","Ubiquiti Unifi (3)"
-    ]},
-    {icon:"📡", title:"Sicurezza & comunicazione", items:[
-      "Telecamere","Staffe per telecamere","Lettori Kughi NFC (2)","Protezione esterna lettore"
-    ]},
-    {icon:"💻", title:"Postazioni & hardware", items:[
-      "PC Desktop (2)","Monitor (2)","Kit tastiera & mouse wireless (2)","Tappetino mouse (2)",
-      "Webcam (2)","Tavoletta grafometrica (2)"
-    ]},
-    {icon:"🖨️", title:"Stampa & gestione documenti", items:[
-      "Lettore Tessere e Sanitarie (2)","Lettore Banco RFID (2)","Ciabatta multipresa (2)",
-      "Stampante fiscale","Stampante multifunzione","Toner stampante (2)"
-    ]},
-    {icon:"🏋️‍♂️", title:"Sistemi palestra & accessi", items:[
-      "SportTrick Setup","Player Red TV","Licenza Player Red TV","Edision HDMI Modulator 3in mini",
-      "Edision SDC-6 Partitore Antenna","Connettori F (10 confezioni da 4)",
-      "Cavo coassiale connettore F 1m","Licenza Office (2)"
-    ]},
-    {icon:"📶", title:"Connettività & IoT", items:[
-      "Gigaset IP","iPhone 16e","Hub Ajax","Rex Ajax","Door Protect Ajax (2 per porta)",
-      "Pulsante Ajax (2)","Home Siren Ajax","Relay Ajax"
-    ]},
-    {icon:"📺", title:"TV & segnaletica", items:[
-      "Televisore Hisense 75\"","Televisore Hisense 65\" (3)","Supporto da parete TV (4)"
-    ]},
-    {icon:"🚨", title:"Cartellonistica", items:[
-      "Cartello Porta Allarmata (2)","Cartello Area Videosorvegliata (3)",
-      "Cartello Pulsante Emergenza Ajax (2 o più)","Striscione Lavora con noi"
-    ]},
-    {icon:"🔖", title:"Adesivi Tornello / Accessi", items:[
-      "Adesivo Solo Entrata Tornello","Adesivo Solo Uscita Tornello",
-      "Adesivo Solo Emergenza Tornello (se presente sportello bandiera)","Adesivo Solo Staff"
-    ]},
-    {icon:"🏗️", title:"Extra", items:[
-      "Transpallet manuale","Kit cancelleria"
-    ]}
-  ];
+var key="fitup-check-materiale-v4";
+var state=load();
 
-  var storageKey = "fitup-check-materiale-v3";
-  var fallbackState = {items:{}, notes:{}};
-  var state = loadState();
+function load(){try{return JSON.parse(localStorage.getItem(key)||'{"items":{},"notes":{}}')}catch(e){return{items:{},notes:{}}}}
+function save(){try{localStorage.setItem(key,JSON.stringify(state))}catch(e){}}
+function id(cat,item){return(cat+"__"+item).toLowerCase().replace(/[^a-z0-9]+/g,"-")}
+function status(x){return state.items[x]||"pending"}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+function all(){var a=[];for(var s=0;s<sections.length;s++){for(var i=0;i<sections[s].items.length;i++){a.push({cat:sections[s].title,item:sections[s].items[i],id:id(sections[s].title,sections[s].items[i])})}}return a}
+function tick(){return '<svg viewBox="0 0 1024 1024"><defs><linearGradient id="g" x1="0" y1="1" x2="1" y2="0"><stop offset="0%" stop-color="#047857"/><stop offset="100%" stop-color="#8DC63F"/></linearGradient></defs><path fill="url(#g)" d="M400.5 744.1c-35.6 0-67.9-20.5-83.1-52.8L205.2 452.7c-21.6-45.9-1.9-100.6 44-122.2 45.9-21.6 100.6-1.9 122.2 44l44.5 94.6L642.6 160.5c30-40.9 87.5-49.7 128.4-19.7 40.9 30 49.7 87.5 19.7 128.4L474.6 699.9c-17.3 23.6-44.8 37.6-74.1 44.2z"/></svg>'}
+function device(){var ua=navigator.userAgent||"",w=innerWidth,h=innerHeight,t=("ontouchstart" in window)||(navigator.maxTouchPoints>0),k=/[?&]mode=kiosk/i.test(location.search);var d="Desktop 🖥️";if(k||(t&&w>=1000&&h>=650))d="Kiosk 🧾";else if(/iPhone|Android.*Mobile|Windows Phone/i.test(ua)||(t&&Math.min(w,h)<760))d="Mobile 📱";else if(/iPad|Tablet|Android/i.test(ua)||t)d="Tablet 📲";document.getElementById("deviceLabel").innerHTML="Dispositivo: "+d}
 
-  function loadState(){
-    try{
-      var raw = window.localStorage ? localStorage.getItem(storageKey) : null;
-      return raw ? JSON.parse(raw) : fallbackState;
-    }catch(e){
-      return fallbackState;
-    }
-  }
+function render(){
+device();
+var q=(document.getElementById("search").value||"").toLowerCase();
+var f=document.getElementById("filter").value;
+var app=document.getElementById("app");app.innerHTML="";
+for(var s=0;s<sections.length;s++){
+ var sec=sections[s], shown=[];
+ for(var i=0;i<sec.items.length;i++){
+  var item=sec.items[i], itemId=id(sec.title,item), st=status(itemId);
+  if((sec.title+" "+item).toLowerCase().indexOf(q)!==-1&&(f==="all"||f===st))shown.push(item);
+ }
+ if(!shown.length)continue;
+ var done=0;for(var d=0;d<shown.length;d++){if(status(id(sec.title,shown[d]))!=="pending")done++}
+ var card=document.createElement("section");card.className="card";
+ card.innerHTML='<div class="head"><h2>'+sec.icon+' '+esc(sec.title)+'</h2><span class="badge">'+done+'/'+shown.length+'</span></div>';
+ for(var j=0;j<shown.length;j++)addItem(card,sec.title,shown[j]);
+ app.appendChild(card);
+}
+summary();
+}
 
-  function save(){
-    try{
-      if(window.localStorage){
-        localStorage.setItem(storageKey, JSON.stringify(state));
-      }
-    }catch(e){}
-  }
+function addItem(card,cat,item){
+var itemId=id(cat,item),st=status(itemId),note=state.notes[itemId]||"";
+var div=document.createElement("div");div.className="item "+st;
+div.innerHTML='<div class="main"><button class="check" type="button">'+tick()+'</button><div style="flex:1;min-width:0"><div class="name">'+esc(item)+'</div><div class="actions"><button data-s="pending" class="'+(st==="pending"?"a-pending":"")+'">Da fare</button><button data-s="ok" class="'+(st==="ok"?"a-ok":"")+'">OK</button><button data-s="missing" class="'+(st==="missing"?"a-missing":"")+'">Manca</button><button data-s="damaged" class="'+(st==="damaged"?"a-damaged":"")+'">Danno</button></div><input class="note" placeholder="Nota per mancanti/danneggiati" value="'+esc(note)+'"></div></div>';
+div.querySelector(".check").onclick=function(){state.items[itemId]=st==="ok"?"pending":"ok";save();render()};
+var bs=div.querySelectorAll(".actions button");for(var b=0;b<bs.length;b++){bs[b].onclick=function(){state.items[itemId]=this.getAttribute("data-s");save();render()}}
+div.querySelector(".note").oninput=function(){state.notes[itemId]=this.value;save()};
+card.appendChild(div);
+}
 
-  function makeId(category,item){
-    return (category + "__" + item).toLowerCase().replace(/[^a-z0-9]+/g,"-");
-  }
+function summary(){
+var a=all(),ok=0,mi=0,da=0,pe=0;
+for(var i=0;i<a.length;i++){var st=status(a[i].id);if(st==="ok")ok++;else if(st==="missing")mi++;else if(st==="damaged")da++;else pe++}
+var comp=ok+mi+da,total=a.length,pct=total?Math.round(comp/total*100):0;
+document.getElementById("okCount").innerHTML=ok;
+document.getElementById("missingCount").innerHTML=mi;
+document.getElementById("damagedCount").innerHTML=da;
+document.getElementById("pendingCount").innerHTML=pe;
+document.getElementById("pct").innerHTML=pct+"%";
+document.getElementById("count").innerHTML=comp+" / "+total+" controllati";
+document.getElementById("bar").style.width=pct+"%";
+document.getElementById("readyBanner").className=(pe===0&&mi===0&&da===0&&ok===total)?"ready show":"ready";
+}
 
-  function getAllItems(){
-    var arr = [];
-    for(var s=0; s<sections.length; s++){
-      for(var i=0; i<sections[s].items.length; i++){
-        arr.push({
-          category:sections[s].title,
-          item:sections[s].items[i],
-          id:makeId(sections[s].title, sections[s].items[i])
-        });
-      }
-    }
-    return arr;
-  }
-
-  function getStatus(id){
-    return state.items[id] || "pending";
-  }
-
-  function setStatus(id,status){
-    state.items[id] = status;
-    save();
-    render();
-  }
-
-  function getDeviceType(){
-    var ua = navigator.userAgent || "";
-    var width = window.innerWidth || document.documentElement.clientWidth || screen.width;
-    var height = window.innerHeight || document.documentElement.clientHeight || screen.height;
-    var maxDim = Math.max(width,height);
-    var minDim = Math.min(width,height);
-    var touch = ("ontouchstart" in window) || (navigator.maxTouchPoints && navigator.maxTouchPoints > 0);
-    var kioskParam = /[?&]mode=kiosk/i.test(window.location.search);
-    var standalone = window.matchMedia && window.matchMedia("(display-mode: fullscreen)").matches;
-    var isMobileUA = /Android.*Mobile|iPhone|iPod|Windows Phone|BlackBerry|Opera Mini/i.test(ua);
-    var isTabletUA = /iPad|Tablet|Android(?!.*Mobile)|Silk/i.test(ua);
-
-    if(kioskParam || standalone || (touch && width >= 1000 && height >= 650)) return "kiosk";
-    if(isMobileUA || (touch && minDim < 760)) return "mobile";
-    if(isTabletUA || (touch && minDim >= 760 && maxDim < 1400)) return "tablet";
-    return "desktop";
-  }
-
-  function applyDevice(){
-    var type = getDeviceType();
-    document.body.className = "device-" + type;
-
-    var label = document.getElementById("deviceLabel");
-    var text = "Desktop";
-    var icon = "🖥️";
-
-    if(type === "mobile"){ text = "Mobile"; icon = "📱"; }
-    if(type === "tablet"){ text = "Tablet"; icon = "📲"; }
-    if(type === "kiosk"){ text = "Kiosk"; icon = "🧾"; }
-
-    label.innerHTML = icon + " Dispositivo: " + text;
-  }
-
-  function tickSvg(){
-    return '' +
-      '<svg viewBox="0 0 1024 1024" aria-hidden="true">' +
-      '<defs><linearGradient id="tickGradient" x1="0" y1="1" x2="1" y2="0">' +
-      '<stop offset="0%" stop-color="#047857"></stop>' +
-      '<stop offset="100%" stop-color="#4ade80"></stop>' +
-      '</linearGradient></defs>' +
-      '<path fill="url(#tickGradient)" d="M400.5 744.1c-35.6 0-67.9-20.5-83.1-52.8L205.2 452.7c-21.6-45.9-1.9-100.6 44-122.2 45.9-21.6 100.6-1.9 122.2 44l44.5 94.6L642.6 160.5c30-40.9 87.5-49.7 128.4-19.7 40.9 30 49.7 87.5 19.7 128.4L474.6 699.9c-17.3 23.6-44.8 37.6-74.1 44.2z"></path>' +
-      '</svg>';
-  }
-
-  function escapeHtml(str){
-    return String(str)
-      .replace(/&/g,"&amp;")
-      .replace(/</g,"&lt;")
-      .replace(/>/g,"&gt;")
-      .replace(/"/g,"&quot;")
-      .replace(/'/g,"&#039;");
-  }
-
-  function render(){
-    applyDevice();
-
-    var query = (document.getElementById("search").value || "").toLowerCase();
-    var filter = document.getElementById("filter").value;
-    var app = document.getElementById("app");
-    app.innerHTML = "";
-
-    for(var s=0; s<sections.length; s++){
-      var section = sections[s];
-      var shown = [];
-
-      for(var i=0; i<section.items.length; i++){
-        var item = section.items[i];
-        var id = makeId(section.title,item);
-        var status = getStatus(id);
-        var matchesQuery = (section.title + " " + item).toLowerCase().indexOf(query) !== -1;
-        var matchesFilter = filter === "all" || status === filter;
-
-        if(matchesQuery && matchesFilter){
-          shown.push(item);
-        }
-      }
-
-      if(!shown.length) continue;
-
-      var doneCount = 0;
-      for(var d=0; d<shown.length; d++){
-        if(getStatus(makeId(section.title,shown[d])) !== "pending") doneCount++;
-      }
-
-      var card = document.createElement("section");
-      card.className = "card";
-      card.innerHTML =
-        '<div class="head">' +
-          '<h2>' + section.icon + ' ' + escapeHtml(section.title) + '</h2>' +
-          '<span class="badge">' + doneCount + '/' + shown.length + '</span>' +
-        '</div>';
-
-      for(var j=0; j<shown.length; j++){
-        appendItem(card, section.title, shown[j]);
-      }
-
-      app.appendChild(card);
-    }
-
-    updateSummary();
-  }
-
-  function appendItem(card, category, item){
-    var id = makeId(category,item);
-    var status = getStatus(id);
-    var note = state.notes[id] || "";
-    var needsNote = status === "missing" || status === "damaged";
-    var noteEmpty = needsNote && note.trim() === "";
-
-    var div = document.createElement("div");
-    div.className = "item status-" + status + (needsNote ? " needs-note" : "") + (noteEmpty ? " note-empty" : "");
-
-    div.innerHTML =
-      '<div class="item-main">' +
-        '<button class="check-button" type="button" aria-label="Segna OK">' + tickSvg() + '</button>' +
-        '<div class="item-body">' +
-          '<div class="name">' + escapeHtml(item) + '</div>' +
-          '<div class="status-actions">' +
-            '<button type="button" class="status-btn ' + (status==="pending" ? "active-pending" : "") + '" data-status="pending">Da fare</button>' +
-            '<button type="button" class="status-btn ' + (status==="ok" ? "active-ok" : "") + '" data-status="ok">OK</button>' +
-            '<button type="button" class="status-btn ' + (status==="missing" ? "active-missing" : "") + '" data-status="missing">Manca</button>' +
-            '<button type="button" class="status-btn ' + (status==="damaged" ? "active-damaged" : "") + '" data-status="damaged">Danno</button>' +
-          '</div>' +
-          '<input class="note" placeholder="Nota obbligatoria per mancanti/danneggiati" value="' + escapeHtml(note) + '">' +
-          '<div class="note-warning">Inserisci una nota per questa voce.</div>' +
-        '</div>' +
-      '</div>';
-
-    div.querySelector(".check-button").onclick = function(){
-      setStatus(id, status === "ok" ? "pending" : "ok");
-    };
-
-    var buttons = div.querySelectorAll(".status-btn");
-    for(var b=0; b<buttons.length; b++){
-      buttons[b].onclick = function(){
-        setStatus(id, this.getAttribute("data-status"));
-      };
-    }
-
-    div.querySelector(".note").oninput = function(){
-      state.notes[id] = this.value;
-      save();
-      render();
-    };
-
-    card.appendChild(div);
-  }
-
-  function updateSummary(){
-    var all = getAllItems();
-    var ok = 0, missing = 0, damaged = 0, pending = 0;
-
-    for(var i=0; i<all.length; i++){
-      var status = getStatus(all[i].id);
-      if(status === "ok") ok++;
-      else if(status === "missing") missing++;
-      else if(status === "damaged") damaged++;
-      else pending++;
-    }
-
-    var completed = ok + missing + damaged;
-    var total = all.length;
-    var pct = total ? Math.round((completed / total) * 100) : 0;
-
-    document.getElementById("okCount").innerHTML = ok;
-    document.getElementById("missingCount").innerHTML = missing;
-    document.getElementById("damagedCount").innerHTML = damaged;
-    document.getElementById("pendingCount").innerHTML = pending;
-
-    document.getElementById("pct").innerHTML = pct + "%";
-    document.getElementById("count").innerHTML = completed + " / " + total + " controllati";
-    document.getElementById("bar").style.width = pct + "%";
-
-    var ready = pending === 0 && missing === 0 && damaged === 0 && ok === total;
-    document.getElementById("readyBanner").className = ready ? "ready-banner show" : "ready-banner";
-  }
-
-  function exportCsv(){
-    var rows = [["Categoria","Materiale","Stato","Note"]];
-    var all = getAllItems();
-
-    for(var i=0; i<all.length; i++){
-      var status = getStatus(all[i].id);
-      var label = status === "ok" ? "OK" :
-                  status === "missing" ? "MANCANTE" :
-                  status === "damaged" ? "DANNEGGIATO" :
-                  "DA CONTROLLARE";
-
-      rows.push([
-        all[i].category,
-        all[i].item,
-        label,
-        state.notes[all[i].id] || ""
-      ]);
-    }
-
-    var csv = "";
-    for(var r=0; r<rows.length; r++){
-      var row = [];
-      for(var c=0; c<rows[r].length; c++){
-        row.push('"' + String(rows[r][c]).replace(/"/g,'""') + '"');
-      }
-      csv += row.join(",") + "\n";
-    }
-
-    var blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
-    var url = URL.createObjectURL(blob);
-    var link = document.createElement("a");
-    link.href = url;
-    link.download = "check-materiale-apertura-palestra.csv";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  }
-
-  document.getElementById("search").oninput = render;
-  document.getElementById("filter").onchange = render;
-  document.getElementById("csv").onclick = exportCsv;
-
-  document.getElementById("printBtn").onclick = function(){
-    window.print();
-  };
-
-  document.getElementById("reset").onclick = function(){
-    if(confirm("Azzerare tutti gli stati e le note?")){
-      state = {items:{}, notes:{}};
-      save();
-      render();
-    }
-  };
-
-  document.getElementById("markAllOk").onclick = function(){
-    if(confirm("Segnare tutto il materiale come OK?")){
-      var all = getAllItems();
-      for(var i=0; i<all.length; i++){
-        state.items[all[i].id] = "ok";
-      }
-      save();
-      render();
-    }
-  };
-
-  window.onresize = function(){
-    applyDevice();
-  };
-
-  render();
-
+document.getElementById("search").oninput=render;
+document.getElementById("filter").onchange=render;
+document.getElementById("printBtn").onclick=function(){window.print()};
+document.getElementById("reset").onclick=function(){if(confirm("Azzerare tutti gli stati e le note?")){state={items:{},notes:{}};save();render()}};
+document.getElementById("markAllOk").onclick=function(){if(confirm("Segnare tutto OK?")){var a=all();for(var i=0;i<a.length;i++)state.items[a[i].id]="ok";save();render()}};
+document.getElementById("csv").onclick=function(){
+var rows=[["Categoria","Materiale","Stato","Note"]],a=all();
+for(var i=0;i<a.length;i++){var st=status(a[i].id),lab=st==="ok"?"OK":st==="missing"?"MANCANTE":st==="damaged"?"DANNEGGIATO":"DA CONTROLLARE";rows.push([a[i].cat,a[i].item,lab,state.notes[a[i].id]||""])}
+var csv="";for(var r=0;r<rows.length;r++){var row=[];for(var c=0;c<rows[r].length;c++)row.push('"'+String(rows[r][c]).replace(/"/g,'""')+'"');csv+=row.join(",")+"\n"}
+var blob=new Blob([csv],{type:"text/csv;charset=utf-8"}),url=URL.createObjectURL(blob),link=document.createElement("a");link.href=url;link.download="check-materiale-fitup.csv";document.body.appendChild(link);link.click();document.body.removeChild(link);URL.revokeObjectURL(url);
+};
+window.onresize=device;
+render();
 })();
 </script>
 </body>
