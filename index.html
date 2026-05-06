@@ -248,7 +248,7 @@ h2{margin:0;font-size:19px}
 .note{display:none;margin-top:10px}
 .missing .note,.damaged .note{display:block}
 .footer{display:flex;justify-content:flex-end;gap:12px;margin-top:20px;flex-wrap:wrap}
-.hidden{display:none}
+.hidden{display:none!important}
 .no-sedi{
   padding:22px;
   border-radius:24px;
@@ -298,19 +298,19 @@ h2{margin:0;font-size:19px}
 <section class="hero">
   <div>
     <img src="logo-fitup.png?v=2" class="logo" alt="FitUP">
-    <h1>Check materiale IT</h1>
-    <div class="sub">Controllo merce per apertura palestra. Dati salvati in cloud e sincronizzati in tempo reale.</div>
+    <h1 id="pageTitle">Check materiale IT</h1>
+    <div class="sub" id="pageSubtitle">Controllo merce per apertura palestra. Dati salvati in cloud e sincronizzati in tempo reale.</div>
     <div class="meta" id="meta"></div>
   </div>
-  <div class="progress">
+  <div class="progress" id="heroProgress">
     <div class="pct" id="pct">0%</div>
     <div class="count" id="count">0 / 0 verificati</div>
   </div>
 </section>
 
-<div class="bar"><div id="bar"></div></div>
+<div class="bar" id="progressBarWrap"><div id="bar"></div></div>
 
-<section class="summary">
+<section class="summary" id="summaryBox">
   <div class="stat warn"><small>Mancanti</small><strong id="missingCount">0</strong></div>
   <div class="stat ok"><small>OK arrivati</small><strong id="okCount">0</strong></div>
   <div class="stat bad"><small>Danneggiati all'arrivo</small><strong id="damagedCount">0</strong></div>
@@ -382,81 +382,7 @@ var ADMIN_EMAILS=[
 ];
 
 var OPEN_COMPLETED_SEDI=[
-  "FitUP Abbiategrasso",
-  "FitUP Albavilla",
-  "FitUP Avola",
-  "FitUp Arezzo",
-  "FitUP Belgioioso",
-  "FitUP Bernareggio",
-  "FitUP Biella",
-  "FitUP Borgo Virgilio",
-  "FitUP Borgosesia",
-  "FitUP Bra",
-  "FitUP Brembate",
-  "FitUP Brescia Est",
-  "FitUP Broni",
-  "FitUP Busto Arsizio",
-  "FitUP Cagliari Newton",
-  "FitUP Cagliari Elmas",
-  "FitUP Cambiago",
-  "FitUP Casale Monferrato",
-  "FitUP Castel Mella",
-  "FitUP Castenedolo",
-  "FitUP CastelFranco Veneto",
-  "FitUP Cassano D'Adda",
-  "FitUP Carbonia",
-  "FitUP Carpenedolo",
-  "FitUP Cecina",
-  "FitUP Cellatica",
-  "FitUP Cervignano",
-  "FitUP Chiari",
-  "FitUP Cinisello Balsamo",
-  "FitUP Codroipo",
-  "FitUP Collesalvetti",
-  "FitUP Corciano",
-  "FitUP Cremona",
-  "FitUP Desenzano del Garda",
-  "FitUP Ferrara Nord",
-  "FitUP Follonica",
-  "FitUP Giussano",
-  "FitUP Guardamiglio",
-  "FitUP Lecco",
-  "FitUP Lissone",
-  "FitUP Marcon",
-  "FitUP Melegnano",
-  "FitUP Montano Lucino",
-  "FitUP Montebelluna",
-  "FitUP Montecchio Maggiore",
-  "FitUP Montelabbate",
-  "FitUP Mortara",
-  "FitUP Nova Milanese",
-  "FitUP Novara",
-  "FitUP Occhiobello",
-  "FitUP Osnago",
-  "FitUP Paese",
-  "FitUP Osimo",
-  "FitUP Pescara",
-  "FitUP Piombino Dese",
-  "FitUP Ponsacco",
-  "FitUP Porto Mantovano",
-  "FitUP Rimini",
-  "FitUP Rosà",
-  "FitUP Rovigo",
-  "FitUP Sacile",
-  "FitUP San Donà di Piave 2",
-  "FitUP Seregno",
-  "FitUP Spilimbergo",
-  "FitUP Suisio",
-  "FitUP Susegana",
-  "FitUP Spresiano",
-  "FitUP Tavagnacco",
-  "FitUP Torino Mirafiori",
-  "FitUP Tortoreto",
-  "FitUP Trento",
-  "FitUP Vergiate",
-  "FitUP Vicenza",
-  "FitUP Vigevano",
-  "FitUP Zero Branco"
+  "FitUP Abbiategrasso","FitUP Albavilla","FitUP Avola","FitUp Arezzo","FitUP Belgioioso","FitUP Bernareggio","FitUP Biella","FitUP Borgo Virgilio","FitUP Borgosesia","FitUP Bra","FitUP Brembate","FitUP Brescia Est","FitUP Broni","FitUP Busto Arsizio","FitUP Cagliari Newton","FitUP Cagliari Elmas","FitUP Cambiago","FitUP Casale Monferrato","FitUP Castel Mella","FitUP Castenedolo","FitUP CastelFranco Veneto","FitUP Cassano D'Adda","FitUP Carbonia","FitUP Carpenedolo","FitUP Cecina","FitUP Cellatica","FitUP Cervignano","FitUP Chiari","FitUP Cinisello Balsamo","FitUP Codroipo","FitUP Collesalvetti","FitUP Corciano","FitUP Cremona","FitUP Desenzano del Garda","FitUP Ferrara Nord","FitUP Follonica","FitUP Giussano","FitUP Guardamiglio","FitUP Lecco","FitUP Lissone","FitUP Marcon","FitUP Melegnano","FitUP Montano Lucino","FitUP Montebelluna","FitUP Montecchio Maggiore","FitUP Montelabbate","FitUP Mortara","FitUP Nova Milanese","FitUP Novara","FitUP Occhiobello","FitUP Osnago","FitUP Paese","FitUP Osimo","FitUP Pescara","FitUP Piombino Dese","FitUP Ponsacco","FitUP Porto Mantovano","FitUP Rimini","FitUP Rosà","FitUP Rovigo","FitUP Sacile","FitUP San Donà di Piave 2","FitUP Seregno","FitUP Spilimbergo","FitUP Suisio","FitUP Susegana","FitUP Spresiano","FitUP Tavagnacco","FitUP Torino Mirafiori","FitUP Tortoreto","FitUP Trento","FitUP Vergiate","FitUP Vicenza","FitUP Vigevano","FitUP Zero Branco"
 ];
 
 var loginBtn=document.getElementById("loginBtn");
@@ -486,19 +412,10 @@ function provider(){
   return p;
 }
 
-function showError(message){
-  loginError.innerText=message;
-  loginError.style.display="block";
-}
-function showInfo(message){
-  loginInfo.innerText=message;
-  loginInfo.style.display="block";
-}
-function clearLoginMessages(){
-  loginError.style.display="none";
-  loginInfo.style.display="none";
-  retryRedirectBtn.style.display="none";
-}
+function showError(message){loginError.innerText=message;loginError.style.display="block"}
+function showInfo(message){loginInfo.innerText=message;loginInfo.style.display="block"}
+function clearLoginMessages(){loginError.style.display="none";loginInfo.style.display="none";retryRedirectBtn.style.display="none"}
+
 function authErrorMessage(error){
   var code=error&&error.code?error.code:"";
   var msg=error&&error.message?error.message:"";
@@ -515,17 +432,14 @@ function smartLogin(){
   clearLoginMessages();
   loginBtn.disabled=true;
   showInfo("Avvio login Google...");
-
-  auth.signInWithPopup(provider())
-    .then(function(){
-      clearLoginMessages();
-    })
-    .catch(function(error){
-      console.error("Popup login error:",error);
-      showError(authErrorMessage(error));
-      loginBtn.disabled=false;
-      retryRedirectBtn.style.display="none";
-    });
+  auth.signInWithPopup(provider()).then(function(){
+    clearLoginMessages();
+  }).catch(function(error){
+    console.error("Popup login error:",error);
+    showError(authErrorMessage(error));
+    loginBtn.disabled=false;
+    retryRedirectBtn.style.display="none";
+  });
 }
 
 function redirectLogin(){
@@ -553,6 +467,14 @@ function all(){var a=[];sections.forEach(function(sec){sec.items.forEach(functio
 function status(x){return cloud[x]&&cloud[x].status?cloud[x].status:"missing"}
 function note(x){return cloud[x]&&cloud[x].note?cloud[x].note:""}
 function ref(itemId){return db.collection("palestre").doc(sede).collection("checklist").doc(itemId)}
+function normalizeEmail(v){return String(v||"").trim().toLowerCase()}
+function normalizeSedeName(v){return String(v||"").trim().replace(/\s+/g," ").replace(/fit up/g,"fitup").toLowerCase()}
+function isAdmin(email){return ADMIN_EMAILS.indexOf(normalizeEmail(email))!==-1}
+
+function isOpenCompletedSede(value){
+  var n=normalizeSedeName(value);
+  return OPEN_COMPLETED_SEDI.some(function(s){return normalizeSedeName(s)===n});
+}
 
 function lastUpdate(x){
   if(!cloud[x])return "";
@@ -561,13 +483,7 @@ function lastUpdate(x){
   if(!by&&!at)return "Nessuna modifica registrata";
   var date="";
   if(at&&at.toDate){
-    date=at.toDate().toLocaleString("it-IT",{
-      day:"2-digit",
-      month:"2-digit",
-      year:"numeric",
-      hour:"2-digit",
-      minute:"2-digit"
-    });
+    date=at.toDate().toLocaleString("it-IT",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"});
   }
   return "Ultima modifica: "+(date||"data non disponibile")+(by?" · "+by:"");
 }
@@ -576,41 +492,19 @@ function tick(){
   return '<svg viewBox="0 0 1024 1024"><defs><linearGradient id="g" x1="0" y1="1" x2="1" y2="0"><stop offset="0%" stop-color="#047857"/><stop offset="100%" stop-color="#8DC63F"/></linearGradient></defs><path fill="url(#g)" d="M400.5 744.1c-35.6 0-67.9-20.5-83.1-52.8L205.2 452.7c-21.6-45.9-1.9-100.6 44-122.2 45.9-21.6 100.6-1.9 122.2 44l44.5 94.6L642.6 160.5c30-40.9 87.5-49.7 128.4-19.7 40.9 30 49.7 87.5 19.7 128.4L474.6 699.9c-17.3 23.6-44.8 37.6-74.1 44.2z"/></svg>';
 }
 
-function normalizeEmail(v){
-  return String(v||"").trim().toLowerCase();
-}
-
-function normalizeSedeName(v){
-  return String(v||"").trim().replace(/[ ]+/g," ").toLowerCase();
-}
-
-function isOpenCompletedSede(value){
-  var n=normalizeSedeName(value);
-  return OPEN_COMPLETED_SEDI.some(function(s){
-    return normalizeSedeName(s)===n;
-  });
-}
-
 function parseItalianDate(value){
   if(!value)return null;
-
-  if(value && value.toDate){
-    return value.toDate();
-  }
-
+  if(value&&value.toDate)return value.toDate();
   var s=String(value).trim();
   if(!s)return null;
-
   var iso=s.match(/^(\d{4})-(\d{2})-(\d{2})/);
   if(iso)return new Date(Number(iso[1]),Number(iso[2])-1,Number(iso[3]));
-
   var it=s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})$/);
   if(it){
     var y=Number(it[3]);
     if(y<100)y+=2000;
     return new Date(y,Number(it[2])-1,Number(it[1]));
   }
-
   var d=new Date(s);
   return isNaN(d.getTime())?null:d;
 }
@@ -618,11 +512,7 @@ function parseItalianDate(value){
 function formatOpenDate(value){
   var d=parseItalianDate(value);
   if(!d)return esc(value||"");
-  return d.toLocaleDateString("it-IT",{
-    day:"2-digit",
-    month:"2-digit",
-    year:"numeric"
-  });
+  return d.toLocaleDateString("it-IT",{day:"2-digit",month:"2-digit",year:"numeric"});
 }
 
 function dateInputToDate(value){
@@ -632,110 +522,8 @@ function dateInputToDate(value){
   return new Date(Number(parts[0]),Number(parts[1])-1,Number(parts[2]));
 }
 
-function sameOrAfter(a,b){
-  if(!a || !b)return true;
-  return a.getTime()>=b.getTime();
-}
-
-function sameOrBefore(a,b){
-  if(!a || !b)return true;
-  return a.getTime()<=b.getTime();
-}
-
-function bindDashboardDateFilters(){
-  var from=document.getElementById("openDateFrom");
-  var to=document.getElementById("openDateTo");
-  var clear=document.getElementById("clearDateFilter");
-
-  if(from)from.onchange=paintDashboardRows;
-  if(to)to.onchange=paintDashboardRows;
-  if(clear){
-    clear.onclick=function(){
-      if(from)from.value="";
-      if(to)to.value="";
-      paintDashboardRows();
-    };
-  }
-}
-
-function paintDashboardRows(){
-  var tbody=document.getElementById("dashboardRows");
-  var counters=document.getElementById("dashboardCounters");
-  if(!tbody || !counters)return;
-
-  var fromEl=document.getElementById("openDateFrom");
-  var toEl=document.getElementById("openDateTo");
-  var from=dateInputToDate(fromEl?fromEl.value:"");
-  var to=dateInputToDate(toEl?toEl.value:"");
-
-  var rows=dashboardRowsCache.filter(function(r){
-    var openDate=parseItalianDate(r.inaugurazione);
-    if((from || to) && !openDate)return false;
-    return sameOrAfter(openDate,from) && sameOrBefore(openDate,to);
-  });
-
-  rows.sort(function(a,b){
-    var ad=parseItalianDate(a.inaugurazione);
-    var bd=parseItalianDate(b.inaugurazione);
-    if(ad && bd && ad.getTime()!==bd.getTime())return ad-bd;
-    if(ad && !bd)return -1;
-    if(!ad && bd)return 1;
-    if(a.isCompletedOpen!==b.isCompletedOpen)return a.isCompletedOpen?1:-1;
-    if(a.pct!==b.pct)return a.pct-b.pct;
-    return a.club.localeCompare(b.club);
-  });
-
-  var openedCompletedCount=rows.filter(function(r){return r.isCompletedOpen}).length;
-  var totalSediCount=rows.length;
-  counters.innerHTML='Palestre aperte completate: '+openedCompletedCount+' · Totale palestre/cantieri: '+totalSediCount;
-
-  if(!rows.length){
-    tbody.innerHTML='<tr><td colspan="8">Nessuna sede trovata con questi filtri.</td></tr>';
-    return;
-  }
-
-  tbody.innerHTML=rows.map(function(r){
-    return '<tr>'+
-      '<td>'+esc(r.club)+'</td>'+
-      '<td>'+esc(r.type)+'</td>'+
-      '<td>'+formatOpenDate(r.inaugurazione)+'</td>'+
-      '<td>'+r.pct+'%</td>'+
-      '<td>'+r.ok+'</td>'+
-      '<td>'+r.missing+'</td>'+
-      '<td>'+r.damaged+'</td>'+
-      '<td>'+esc(r.latest)+'</td>'+
-    '</tr>';
-  }).join("");
-}
-
-function normalizeSedeName(v){
-  return String(v||"").trim().replace(/\s+/g," ").toLowerCase();
-}
-
-function isOpenCompletedSede(value){
-  var n=normalizeSedeName(value);
-  return OPEN_COMPLETED_SEDI.some(function(s){
-    return normalizeSedeName(s)===n;
-  });
-}
-
-function normalizeSedeName(v){
-  return String(v||"")
-    .trim()
-    .replace(/\s+/g," ")
-    .toLowerCase();
-}
-
-function isOpenCompletedSede(value){
-  var n=normalizeSedeName(value);
-  return OPEN_COMPLETED_SEDI.some(function(s){
-    return normalizeSedeName(s)===n;
-  });
-}
-
-function isAdmin(email){
-  return ADMIN_EMAILS.indexOf(normalizeEmail(email))!==-1;
-}
+function sameOrAfter(a,b){if(!a||!b)return true;return a.getTime()>=b.getTime()}
+function sameOrBefore(a,b){if(!a||!b)return true;return a.getTime()<=b.getTime()}
 
 function updateAdminViewSwitcher(){
   if(!user || !isAdmin(user.email)){
@@ -743,7 +531,6 @@ function updateAdminViewSwitcher(){
     currentView="checklist";
     return;
   }
-
   adminViewSwitcher.className="view-switcher";
   adminViewSwitcher.querySelectorAll("button").forEach(function(btn){
     btn.className=btn.getAttribute("data-view")===currentView?"active":"";
@@ -760,9 +547,26 @@ function uniqueSedi(list){
   var map={};
   list.forEach(function(s){
     if(!s || !s.id)return;
-    map[s.id]=s;
+    var label=s.club||s.id;
+    var key=normalizeSedeName(label);
+
+    if(
+      key==="palestra" ||
+      key==="prossime aperture" ||
+      key==="inaugurazione" ||
+      key==="club"
+    ){
+      return;
+    }
+
+    if(!map[key])map[key]=s;
   });
-  return Object.keys(map).sort(function(a,b){return a.localeCompare(b)}).map(function(k){return map[k]});
+
+  return Object.keys(map).sort(function(a,b){
+    return (map[a].club||map[a].id).localeCompare(map[b].club||map[b].id);
+  }).map(function(k){
+    return map[k];
+  });
 }
 
 function loadAuthorizedSedi(){
@@ -881,8 +685,40 @@ function setNote(itemId,cat,item,value){
   },{merge:true});
 }
 
+function updatePageLayout(){
+  var pageTitle=document.getElementById("pageTitle");
+  var pageSubtitle=document.getElementById("pageSubtitle");
+  var summaryBox=document.getElementById("summaryBox");
+  var readyBanner=document.getElementById("readyBanner");
+  var heroProgress=document.getElementById("heroProgress");
+  var progressBarWrap=document.getElementById("progressBarWrap");
+
+  if(currentView==="dashboard"){
+    pageTitle.innerHTML="Dashboard";
+    pageSubtitle.innerHTML="Vista globale avanzamento sedi, cantieri e checklist arrivo.";
+    summaryBox.className="summary hidden";
+    readyBanner.className="ready hidden";
+    heroProgress.className="progress hidden";
+    progressBarWrap.className="bar hidden";
+  }else if(currentView==="magazzino"){
+    pageTitle.innerHTML="Magazzino";
+    pageSubtitle.innerHTML="Gestione preparazione e spedizione materiale per le sedi.";
+    summaryBox.className="summary hidden";
+    readyBanner.className="ready hidden";
+    heroProgress.className="progress hidden";
+    progressBarWrap.className="bar hidden";
+  }else{
+    pageTitle.innerHTML="Check materiale IT";
+    pageSubtitle.innerHTML="Controllo merce per apertura palestra. Dati salvati in cloud e sincronizzati in tempo reale.";
+    summaryBox.className="summary";
+    heroProgress.className="progress";
+    progressBarWrap.className="bar";
+  }
+}
+
 function render(){
   updateAdminViewSwitcher();
+  updatePageLayout();
 
   document.getElementById("meta").innerHTML="Sede: "+esc(sede||"-")+" · Utente: "+esc(user?user.email:"");
   var q=(document.getElementById("search").value||"").toLowerCase();
@@ -988,14 +824,8 @@ function renderDashboard(app){
       var latest=isCompletedOpen?"Sede già aperta/completata":"Nessuna modifica";
 
       if(latestAt && !isCompletedOpen){
-        latest=latestAt.toLocaleString("it-IT",{
-          day:"2-digit",
-          month:"2-digit",
-          year:"numeric",
-          hour:"2-digit",
-          minute:"2-digit"
-        });
-        if(latestBy)latest += " · " + latestBy;
+        latest=latestAt.toLocaleString("it-IT",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"});
+        if(latestBy)latest+=" · "+latestBy;
       }
 
       return {
@@ -1012,7 +842,7 @@ function renderDashboard(app){
       };
     });
   })).then(function(rows){
-    dashboardRowsCache=rows;
+    dashboardRowsCache=uniqueDashboardRows(rows);
     bindDashboardDateFilters();
     paintDashboardRows();
   }).catch(function(error){
@@ -1020,6 +850,15 @@ function renderDashboard(app){
     tbody.innerHTML='<tr><td colspan="8">Errore caricamento dashboard.</td></tr>';
     counters.innerHTML='Errore caricamento conteggi.';
   });
+}
+
+function uniqueDashboardRows(rows){
+  var map={};
+  rows.forEach(function(r){
+    var key=normalizeSedeName(r.club||r.id);
+    if(!map[key])map[key]=r;
+  });
+  return Object.keys(map).map(function(k){return map[k]});
 }
 
 function bindDashboardDateFilters(){
@@ -1142,7 +981,12 @@ function summary(){
   document.getElementById("pct").innerHTML=pct+"%";
   document.getElementById("count").innerHTML=comp+" / "+total+" verificati";
   document.getElementById("bar").style.width=pct+"%";
-  document.getElementById("readyBanner").className=(sede&&mi===0&&da===0&&ok===total)?"ready show":"ready";
+
+  if(currentView==="checklist"){
+    document.getElementById("readyBanner").className=(sede&&mi===0&&da===0&&ok===total)?"ready show":"ready";
+  }else{
+    document.getElementById("readyBanner").className="ready hidden";
+  }
 }
 
 sedeSelect.onchange=function(){
@@ -1162,9 +1006,7 @@ document.getElementById("filter").onchange=render;
 document.getElementById("printBtn").onclick=function(){window.print()};
 
 adminViewSwitcher.querySelectorAll("button").forEach(function(btn){
-  btn.onclick=function(){
-    setView(this.getAttribute("data-view"));
-  };
+  btn.onclick=function(){setView(this.getAttribute("data-view"))};
 });
 
 document.getElementById("markAllOk").onclick=function(){
