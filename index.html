@@ -1,215 +1,692 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="it">
 <head>
-<meta charset="UTF-8">
-<title>FitUP Check Materiale</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>FitUP - Check Materiale IT</title>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 
 <style>
+:root{
+  --green:#8DC63F;
+  --black:#1D1D1B;
+  --white:#fff;
+  --bg:#eef5e8;
+  --line:rgba(29,29,27,.28);
+  --ok:#8DC63F;
+  --warn:#f59e0b;
+  --bad:#dc2626;
+  --pending:#94a3b8;
+}
+*{box-sizing:border-box}
 body{
-  font-family:Arial;
-  background:#0f1a12;
-  color:#fff;
   margin:0;
-  padding:20px;
+  font-family:Arial,Helvetica,sans-serif;
+  background:
+    radial-gradient(circle at 10% 0%,rgba(141,198,63,.35),transparent 30%),
+    radial-gradient(circle at 90% 10%,rgba(141,198,63,.18),transparent 28%),
+    linear-gradient(145deg,#1D1D1B 0%,#151613 34%,#eef5e8 34%,#f7faf4 100%);
+  color:var(--black);
 }
-
-/* HEADER */
+button,input,select{font-family:inherit;font-size:16px}
+.wrap{max-width:1320px;margin:auto;padding:24px}
+.logo{
+  width:190px;
+  max-width:100%;
+  margin-bottom:16px;
+  filter:drop-shadow(0 8px 16px rgba(0,0,0,.65));
+  animation:logoIn .55s ease both;
+}
+@keyframes logoIn{
+  from{opacity:0;transform:translateY(-10px) scale(.96)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+.login{
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  color:white;
+  text-align:center;
+}
+.login-card{
+  width:min(500px,92vw);
+  padding:34px;
+  border-radius:34px;
+  background:rgba(29,29,27,.84);
+  border:2px solid var(--green);
+  box-shadow:0 30px 90px rgba(0,0,0,.45),0 0 40px rgba(141,198,63,.16);
+  backdrop-filter:blur(20px) saturate(150%);
+  -webkit-backdrop-filter:blur(20px) saturate(150%);
+}
+.login-card h1{margin:8px 0 10px;font-size:34px}
+.login-card p{color:rgba(255,255,255,.75);line-height:1.45}
+.login-error{
+  display:none;
+  margin-top:16px;
+  padding:14px;
+  border-radius:16px;
+  background:#fee2e2;
+  color:#7f1d1d;
+  font-weight:800;
+  font-size:14px;
+  line-height:1.35;
+  text-align:left;
+}
+.login-info{
+  display:none;
+  margin-top:16px;
+  padding:14px;
+  border-radius:16px;
+  background:rgba(141,198,63,.16);
+  color:#d9ffb0;
+  border:1px solid rgba(141,198,63,.45);
+  font-weight:800;
+  font-size:14px;
+  line-height:1.35;
+  text-align:left;
+}
+.btn{
+  border:0;
+  border-radius:18px;
+  min-height:52px;
+  padding:12px 18px;
+  font-weight:900;
+  cursor:pointer;
+  transition:transform .12s ease,box-shadow .12s ease,opacity .12s ease;
+}
+.btn:hover{box-shadow:0 8px 22px rgba(0,0,0,.18)}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.primary{
+  background:linear-gradient(135deg,#8DC63F,#c7f27d);
+  color:var(--black);
+  border:2px solid #6da52f;
+}
+.dark{
+  background:var(--black);
+  color:white;
+  border:2px solid var(--green);
+}
+.light{
+  background:white;
+  color:var(--black);
+  border:2px solid var(--line);
+}
 .hero{
-  border:2px solid #8cff00;
-  border-radius:20px;
-  padding:20px;
-  margin-bottom:20px;
-}
-
-/* TOOLBAR */
-.toolbar{
+  position:relative;
+  overflow:hidden;
+  color:white;
+  border-radius:34px;
+  padding:28px;
   display:flex;
-  gap:10px;
-  margin-bottom:20px;
+  justify-content:space-between;
+  gap:24px;
+  align-items:center;
+  background:
+    linear-gradient(135deg,rgba(29,29,27,.96),rgba(29,29,27,.78)),
+    radial-gradient(circle at 80% 0%,rgba(141,198,63,.32),transparent 30%);
+  border:2px solid var(--green);
+  box-shadow:0 28px 80px rgba(0,0,0,.35),0 0 34px rgba(141,198,63,.14);
 }
-
-input,select,button{
-  padding:10px;
-  border-radius:10px;
-  border:none;
+.hero:before{
+  content:"";
+  position:absolute;
+  inset:-2px;
+  background:linear-gradient(120deg,transparent,rgba(255,255,255,.16),transparent);
+  transform:translateX(-80%);
+  animation:shine 6s infinite;
+  pointer-events:none;
 }
-
-/* CARDS */
-.grid{
+@keyframes shine{
+  0%{transform:translateX(-80%)}
+  40%,100%{transform:translateX(120%)}
+}
+.hero h1{margin:8px 0 8px;font-size:42px;line-height:1}
+.sub{color:rgba(255,255,255,.78)}
+.meta{margin-top:12px;color:var(--green);font-weight:900}
+.progress{text-align:right;min-width:190px}
+.pct{font-size:56px;font-weight:900;color:var(--green);line-height:1}
+.count{color:rgba(255,255,255,.78);font-weight:900;margin-top:8px}
+.bar{
+  height:16px;
+  background:rgba(255,255,255,.42);
+  border-radius:999px;
+  overflow:hidden;
+  margin:18px 0;
+  border:1px solid rgba(29,29,27,.18);
+}
+.bar div{
+  height:100%;
+  width:0;
+  background:linear-gradient(90deg,#8DC63F,#d5ff9a);
+  box-shadow:0 0 18px rgba(141,198,63,.8);
+  transition:.25s;
+}
+.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px}
+.stat{
+  border-radius:26px;
+  padding:18px;
+  background:rgba(255,255,255,.78);
+  border:2px solid var(--line);
+  box-shadow:0 18px 50px rgba(0,0,0,.14);
+  backdrop-filter:blur(18px) saturate(150%);
+  -webkit-backdrop-filter:blur(18px) saturate(150%);
+}
+.stat small{color:#4b5563;font-weight:900}
+.stat strong{display:block;margin-top:8px;font-size:34px}
+.stat.ok{border-color:var(--green)}
+.stat.ok strong{color:var(--ok)}
+.stat.warn strong{color:var(--warn)}
+.stat.bad strong{color:var(--bad)}
+.toolbar{
   display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
-  gap:20px;
+  grid-template-columns:1fr 190px 150px 150px 120px;
+  gap:12px;
+  padding:14px;
+  margin-bottom:18px;
+  border-radius:28px;
+  border:2px solid var(--line);
+  background:rgba(255,255,255,.78);
+  box-shadow:0 20px 60px rgba(0,0,0,.16);
+  backdrop-filter:blur(22px) saturate(170%);
+  -webkit-backdrop-filter:blur(22px) saturate(170%);
 }
-
+input,select{
+  width:100%;
+  min-height:54px;
+  border:2px solid var(--line);
+  border-radius:18px;
+  padding:13px 15px;
+  outline:none;
+  background:rgba(255,255,255,.88);
+}
+input:focus,select:focus{border-color:var(--green);box-shadow:0 0 0 4px rgba(141,198,63,.22)}
+.ready{
+  display:none;
+  margin-bottom:18px;
+  padding:18px;
+  border-radius:26px;
+  text-align:center;
+  font-weight:900;
+  color:#244908;
+  background:rgba(220,252,231,.85);
+  border:2px solid var(--green);
+}
+.ready.show{display:block}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
 .card{
-  background:#f1f1f1;
-  color:#000;
-  border-radius:15px;
-  padding:15px;
+  border-radius:30px;
+  padding:18px;
+  border:2px solid var(--line);
+  background:rgba(255,255,255,.76);
+  box-shadow:0 20px 60px rgba(0,0,0,.16);
+  backdrop-filter:blur(22px) saturate(170%);
+  -webkit-backdrop-filter:blur(22px) saturate(170%);
 }
-
-/* ACTIONS */
-.actions{
+.card:hover{border-color:rgba(141,198,63,.85)}
+.head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
+h2{margin:0;font-size:19px}
+.badge{
+  background:rgba(141,198,63,.18);
+  color:#355d12;
+  border:1px solid rgba(141,198,63,.55);
+  border-radius:999px;
+  padding:8px 12px;
+  font-size:12px;
+  font-weight:900;
+}
+.item{
+  border:2px solid rgba(29,29,27,.18);
+  border-radius:22px;
+  padding:14px;
+  margin:11px 0;
+  background:rgba(255,247,230,.9);
+  border-color:var(--warn);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.75),0 10px 26px rgba(0,0,0,.08);
+}
+.item.ok{background:rgba(241,249,233,.88);border-color:var(--green)}
+.item.missing{background:rgba(255,247,230,.9);border-color:var(--warn)}
+.item.damaged{background:rgba(255,240,240,.9);border-color:var(--bad)}
+.main{display:flex;gap:13px;align-items:flex-start}
+.check{
+  width:42px;height:42px;min-width:42px;
+  border:2.5px solid rgba(29,29,27,.28);
+  border-radius:13px;
+  background:white;
   display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:8px;
-  margin-top:10px;
+  place-items:center;
+  cursor:pointer;
+  box-shadow:inset 0 1px 0 #fff,0 6px 16px rgba(0,0,0,.10);
 }
-
+.check svg{width:32px;height:32px;opacity:0;transform:scale(.65);transition:.14s}
+.ok .check{border-color:var(--green);box-shadow:0 0 0 4px rgba(141,198,63,.18)}
+.ok .check svg{opacity:1;transform:scale(1)}
+.name{font-weight:900;line-height:1.28}
+.ok .name{color:#4b7d12}.missing .name{color:#92400e}.damaged .name{color:#991b1b}
+.actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
 .actions button{
-  padding:8px;
-  border-radius:10px;
+  border:2px solid rgba(29,29,27,.18);
+  background:rgba(255,255,255,.78);
+  border-radius:14px;
+  min-height:42px;
+  font-weight:900;
   cursor:pointer;
 }
-
-/* COLORI */
-.a-ok{background:#8cff00;}
-.a-missing{background:#ff9800;}
-.a-damaged{background:#ff3b3b;color:#fff;}
-
+.actions .a-ok{background:var(--green);color:var(--black);border-color:#6fa82f}
+.actions .a-missing{background:var(--warn);color:#111827;border-color:#d97706}
+.actions .a-damaged{background:var(--bad);color:#fff;border-color:#991b1b}
+.note{display:none;margin-top:10px}
+.missing .note,.damaged .note{display:block}
+.footer{display:flex;justify-content:flex-end;gap:12px;margin-top:20px;flex-wrap:wrap}
+.hidden{display:none}
+@media(max-width:900px){
+  .wrap{padding:12px}
+  .hero{display:block}
+  .logo{width:170px}
+  .hero h1{font-size:31px}
+  .progress{text-align:left;margin-top:18px}
+  .pct{font-size:44px}
+  .summary{grid-template-columns:1fr}
+  .toolbar,.grid{grid-template-columns:1fr}
+  .actions{grid-template-columns:1fr}
+  .btn{width:100%}
+}
+@media(min-width:1450px){.grid{grid-template-columns:repeat(3,1fr)}}
+@media print{
+  body{background:#fff}
+  .toolbar,.footer,.actions,.note,#logout{display:none}
+  .hero,.card,.stat{box-shadow:none}
+  .grid{grid-template-columns:1fr}
+}
 </style>
 </head>
 
 <body>
 
-<div class="hero">
-  <h1>Check materiale IT</h1>
-  <div id="meta"></div>
+<div id="loginView" class="login">
+  <div class="login-card">
+    <img src="logo-fitup.png?v=2" class="logo" alt="FitUP">
+    <h1>Check materiale IT</h1>
+    <p>Accesso riservato agli account aziendali FitUP.</p>
+    <button class="btn primary" id="loginBtn">Login con Google</button>
+    <button class="btn dark" id="retryRedirectBtn" style="display:none;margin-top:10px;width:100%">Riprova con login sicuro</button>
+    <div id="loginInfo" class="login-info"></div>
+    <div id="loginError" class="login-error"></div>
+  </div>
 </div>
 
-<div class="toolbar">
+<div id="appView" class="hidden">
+<div class="wrap">
+
+<section class="hero">
+  <div>
+    <img src="logo-fitup.png?v=2" class="logo" alt="FitUP">
+    <h1>Check materiale IT</h1>
+    <div class="sub">Controllo merce per apertura palestra. Dati salvati in cloud e sincronizzati in tempo reale.</div>
+    <div class="meta" id="meta"></div>
+  </div>
+  <div class="progress">
+    <div class="pct" id="pct">0%</div>
+    <div class="count" id="count">0 / 0 verificati</div>
+  </div>
+</section>
+
+<div class="bar"><div id="bar"></div></div>
+
+<section class="summary">
+  <div class="stat warn"><small>Mancanti</small><strong id="missingCount">0</strong></div>
+  <div class="stat ok"><small>OK arrivati</small><strong id="okCount">0</strong></div>
+  <div class="stat bad"><small>Danneggiati all'arrivo</small><strong id="damagedCount">0</strong></div>
+</section>
+
+<div class="ready" id="readyBanner">✅ Tutto il materiale risulta arrivato e conforme.</div>
+
+<section class="toolbar">
   <input id="search" placeholder="Cerca materiale">
-  
   <select id="filter">
     <option value="all">Tutti</option>
     <option value="missing">Mancanti</option>
     <option value="ok">OK arrivati</option>
-    <option value="damaged">Danneggiati</option>
+    <option value="damaged">Danneggiati all'arrivo</option>
   </select>
+  <button class="btn primary" id="csv">Esporta CSV</button>
+  <button class="btn light" id="printBtn">PDF</button>
+  <button class="btn dark" id="logout">Logout</button>
+</section>
+
+<main class="grid" id="app"></main>
+
+<div class="footer">
+  <button class="btn light" id="reset">Reset sede</button>
+  <button class="btn primary" id="markAllOk">Segna tutto OK arrivato</button>
 </div>
 
-<div id="app" class="grid"></div>
-
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+</div>
+</div>
 
 <script>
-
-/* CONFIG FIREBASE */
 firebase.initializeApp({
-  apiKey: "XXX",
-  authDomain: "XXX",
-  projectId: "XXX"
+  apiKey:"AIzaSyAkdqagTY86afYpdJT43oMGY5UkopsTF5M",
+  authDomain:"fitup-check-materiale.firebaseapp.com",
+  projectId:"fitup-check-materiale",
+  storageBucket:"fitup-check-materiale.firebasestorage.app",
+  messagingSenderId:"838360520294",
+  appId:"1:838360520294:web:a77ffe3854a354ee8affa7"
 });
 
-var db = firebase.firestore();
-
-/* VAR GLOBALI */
+var auth=firebase.auth();
+var db=firebase.firestore();
 var user=null;
-var sede="default";
 var cloud={};
-var sedeInfo=null;
+var unsubscribe=null;
+var redirectHandled=false;
+var sede=new URLSearchParams(location.search).get("sede")||"default";
 
-/* STATUS DEFAULT */
-function status(x){
-  return cloud[x] && cloud[x].status ? cloud[x].status : "missing";
+var loginBtn=document.getElementById("loginBtn");
+var retryRedirectBtn=document.getElementById("retryRedirectBtn");
+var loginError=document.getElementById("loginError");
+var loginInfo=document.getElementById("loginInfo");
+
+var sections=[
+{icon:"🔧",title:"Materiale tecnico base",items:["Tornello","Impianto Audio","Rack 19\"","Patch Panel Rack","Dadi a gabbia per rack (20)","Ripiano Rack (2)","Ciabatta Shuko Rack (2)","Cavo Patch Ethernet 0,5m (3x10)","Cavo Patch Ethernet 1m (3x10)","Hard Disk","NVR Dahua"]},
+{icon:"🌐",title:"Networking & alimentazione",items:["Switch","Switch PoE","UPS","Ubiquiti Unifi (3)"]},
+{icon:"📡",title:"Sicurezza & comunicazione",items:["Telecamere","Staffe per telecamere","Lettori Kughi NFC (2)","Protezione esterna lettore"]},
+{icon:"💻",title:"Postazioni & hardware",items:["PC Desktop (2)","Monitor (2)","Kit tastiera & mouse wireless (2)","Tappetino mouse (2)","Webcam (2)","Tavoletta grafometrica (2)"]},
+{icon:"🖨️",title:"Stampa & gestione documenti",items:["Lettore Tessere e Sanitarie (2)","Lettore Banco RFID (2)","Ciabatta multipresa (2)","Stampante fiscale","Stampante multifunzione","Toner stampante (2)"]},
+{icon:"🏋️‍♂️",title:"Sistemi palestra & accessi",items:["SportTrick Setup","Player Red TV","Licenza Player Red TV","Edision HDMI Modulator 3in mini","Edision SDC-6 Partitore Antenna","Connettori F (10 confezioni da 4)","Cavo coassiale connettore F 1m","Licenza Office (2)"]},
+{icon:"📶",title:"Connettività & IoT",items:["Gigaset IP","iPhone 16e","Hub Ajax","Rex Ajax","Door Protect Ajax (2 per porta)","Pulsante Ajax (2)","Home Siren Ajax","Relay Ajax"]},
+{icon:"📺",title:"TV & segnaletica",items:["Televisore Hisense 75\"","Televisore Hisense 65\" (3)","Supporto da parete TV (4)"]},
+{icon:"🚨",title:"Cartellonistica",items:["Cartello Porta Allarmata (2)","Cartello Area Videosorvegliata (3)","Cartello Pulsante Emergenza Ajax (2 o più)","Striscione Lavora con noi"]},
+{icon:"🔖",title:"Adesivi Tornello / Accessi",items:["Adesivo Solo Entrata Tornello","Adesivo Solo Uscita Tornello","Adesivo Solo Emergenza Tornello (se presente sportello bandiera)","Adesivo Solo Staff"]},
+{icon:"🏗️",title:"Extra",items:["Transpallet manuale","Kit cancelleria"]}
+];
+
+function provider(){
+  var p=new firebase.auth.GoogleAuthProvider();
+  p.setCustomParameters({hd:"fitup.it", prompt:"select_account"});
+  return p;
 }
 
-/* SET STATUS */
-function setStatus(id,s){
-  db.collection("check").doc(sede).collection("items").doc(id).set({
-    status:s
+function showError(message){
+  loginError.innerText=message;
+  loginError.style.display="block";
+}
+
+function showInfo(message){
+  loginInfo.innerText=message;
+  loginInfo.style.display="block";
+}
+
+function clearLoginMessages(){
+  loginError.style.display="none";
+  loginInfo.style.display="none";
+  retryRedirectBtn.style.display="none";
+}
+
+function authErrorMessage(error){
+  var code=error && error.code ? error.code : "";
+  var msg=error && error.message ? error.message : "";
+  if(code==="auth/popup-blocked"){
+    return "Popup bloccato. Abilita i popup per questo sito oppure usa il login sicuro.";
+  }
+  if(code==="auth/popup-closed-by-user"){
+    return "Login interrotto. Completa il popup Google senza chiuderlo.";
+  }
+  if(code==="auth/unauthorized-domain"){
+    return "Dominio non autorizzato in Firebase. Aggiungi lucavisentinfitup.github.io nei domini autorizzati.";
+  }
+  if(code==="auth/operation-not-allowed"){
+    return "Provider Google non abilitato in Firebase Authentication.";
+  }
+  if(code==="auth/internal-error" || msg.indexOf("missing initial state")!==-1 || msg.indexOf("sessionStorage")!==-1){
+    return "Il browser sta bloccando la sessione di login. Apri la pagina in finestra normale, abilita cookie/popup e usa Chrome o Edge. Puoi anche usare il login sicuro.";
+  }
+  return "Login non riuscito. Riprova o usa il login sicuro. Dettaglio: "+(code||msg);
+}
+
+function smartLogin(){
+  clearLoginMessages();
+  loginBtn.disabled = true;
+  showInfo("Avvio login Google...");
+
+  auth.signInWithPopup(provider())
+    .then(function(){
+      clearLoginMessages();
+    })
+    .catch(function(error){
+      console.error("Popup login error:", error);
+      showError(authErrorMessage(error));
+
+      var isCritical =
+        error.code === "auth/popup-blocked" ||
+        error.code === "auth/cancelled-popup-request" ||
+        error.code === "auth/internal-error" ||
+        (error.message && error.message.includes("missing initial state")) ||
+        (error.message && error.message.includes("sessionStorage"));
+
+      if(isCritical){
+        showInfo("Browser restrittivo → login sicuro...");
+        setTimeout(function(){
+          auth.signInWithRedirect(provider());
+        }, 500);
+        return;
+      }
+
+      loginBtn.disabled = false;
+      retryRedirectBtn.style.display = "block";
+    });
+}
+
+function redirectLogin(){
+  clearLoginMessages();
+  loginBtn.disabled=true;
+  retryRedirectBtn.disabled=true;
+  showInfo("Reindirizzamento a Google in corso...");
+  auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+    .then(function(){
+      return auth.signInWithRedirect(provider());
+    })
+    .catch(function(error){
+      console.error("Redirect start error:",error);
+      loginBtn.disabled=false;
+      retryRedirectBtn.disabled=false;
+      retryRedirectBtn.style.display="block";
+      showError(authErrorMessage(error));
+    });
+}
+
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(function(error){
+  console.warn("Persistence warning:",error);
+});
+
+auth.getRedirectResult()
+  .then(function(result){
+    if(result && result.user){
+      clearLoginMessages();
+    }
+  })
+  .catch(function(error){
+    console.error("Redirect result error:", error);
+    showError(authErrorMessage(error));
+    retryRedirectBtn.style.display = "block";
+  });
+
+function id(cat,item){return(cat+"__"+item).toLowerCase().replace(/[^a-z0-9]+/g,"-")}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+function all(){var a=[];sections.forEach(function(sec){sec.items.forEach(function(item){a.push({cat:sec.title,item:item,id:id(sec.title,item)})})});return a}
+function status(x){return cloud[x]&&cloud[x].status?cloud[x].status:"missing"}
+function note(x){return cloud[x]&&cloud[x].note?cloud[x].note:""}
+function ref(itemId){return db.collection("palestre").doc(sede).collection("checklist").doc(itemId)}
+function tick(){return '<svg viewBox="0 0 1024 1024"><defs><linearGradient id="g" x1="0" y1="1" x2="1" y2="0"><stop offset="0%" stop-color="#047857"/><stop offset="100%" stop-color="#8DC63F"/></linearGradient></defs><path fill="url(#g)" d="M400.5 744.1c-35.6 0-67.9-20.5-83.1-52.8L205.2 452.7c-21.6-45.9-1.9-100.6 44-122.2 45.9-21.6 100.6-1.9 122.2 44l44.5 94.6L642.6 160.5c30-40.9 87.5-49.7 128.4-19.7 40.9 30 49.7 87.5 19.7 128.4L474.6 699.9c-17.3 23.6-44.8 37.6-74.1 44.2z"/></svg>'}
+
+function setStatus(itemId,cat,item,st){
+  ref(itemId).set({
+    categoria:cat,
+    materiale:item,
+    status:st,
+    note:note(itemId),
+    updatedBy:user.email,
+    updatedAt:firebase.firestore.FieldValue.serverTimestamp()
   },{merge:true});
 }
 
-/* LISTEN DATI */
+function setNote(itemId,cat,item,value){
+  ref(itemId).set({
+    categoria:cat,
+    materiale:item,
+    status:status(itemId),
+    note:value,
+    updatedBy:user.email,
+    updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+  },{merge:true});
+}
+
 function listen(){
-  db.collection("check").doc(sede).collection("items")
-  .onSnapshot(function(snapshot){
+  if(unsubscribe)unsubscribe();
+  unsubscribe=db.collection("palestre").doc(sede).collection("checklist").onSnapshot(function(snapshot){
     cloud={};
-    snapshot.forEach(function(doc){
-      cloud[doc.id]=doc.data();
-    });
+    snapshot.forEach(function(doc){cloud[doc.id]=doc.data()});
     render();
+  },function(error){
+    console.error("Firestore listen error:",error);
+    alert("Errore lettura cloud Firestore. Verifica connessione e regole Firebase.");
   });
 }
 
-/* LISTEN SEDE */
-function listenSedeInfo(){
-  db.collection("sedi").doc(sede).onSnapshot(function(doc){
-    sedeInfo = doc.exists ? doc.data() : null;
-    render();
-  });
-}
-
-/* RENDER */
 function render(){
+  document.getElementById("meta").innerHTML="Sede: "+esc(sede)+" · Utente: "+esc(user.email);
+  var q=(document.getElementById("search").value||"").toLowerCase();
+  var f=document.getElementById("filter").value;
+  var app=document.getElementById("app");
+  app.innerHTML="";
 
-  var container=document.getElementById("app");
-  container.innerHTML="";
-
-  var search=document.getElementById("search").value.toLowerCase();
-  var filter=document.getElementById("filter").value;
-
-  var info = sedeInfo || {};
-  document.getElementById("meta").innerHTML =
-    "Sede: "+(info.club||sede)+" | Utente: "+(user?user.email:"");
-
-  var items=[
-    "Switch",
-    "Firewall",
-    "Telecamere",
-    "Server"
-  ];
-
-  items.forEach(function(name){
-
-    var id=name;
-    var st=status(id);
-
-    if(search && !name.toLowerCase().includes(search)) return;
-    if(filter!=="all" && st!==filter) return;
-
-    var div=document.createElement("div");
-    div.className="card";
-
-    div.innerHTML=
-      "<b>"+name+"</b>"+
-      "<div class='actions'>"+
-      "<button class='"+(st==="missing"?"a-missing":"")+"' data-s='missing'>Manca</button>"+
-      "<button class='"+(st==="ok"?"a-ok":"")+"' data-s='ok'>OK arrivato</button>"+
-      "<button class='"+(st==="damaged"?"a-damaged":"")+"' data-s='damaged'>Danneggiato</button>"+
-      "</div>";
-
-    div.querySelectorAll("button").forEach(function(btn){
-      btn.onclick=function(){
-        setStatus(id,btn.dataset.s);
-      }
+  sections.forEach(function(sec){
+    var shown=sec.items.filter(function(item){
+      var st=status(id(sec.title,item));
+      return (sec.title+" "+item).toLowerCase().indexOf(q)!==-1&&(f==="all"||f===st);
     });
+    if(!shown.length)return;
 
-    container.appendChild(div);
+    var done=shown.filter(function(item){
+      var st=status(id(sec.title,item));
+      return st==="ok" || st==="damaged";
+    }).length;
 
+    var card=document.createElement("section");
+    card.className="card";
+    card.innerHTML='<div class="head"><h2>'+sec.icon+" "+esc(sec.title)+'</h2><span class="badge">'+done+"/"+shown.length+"</span></div>";
+    shown.forEach(function(item){addItem(card,sec.title,item)});
+    app.appendChild(card);
   });
 
+  summary();
 }
 
-/* AUTH */
-firebase.auth().onAuthStateChanged(function(u){
-  if(u){
-    user=u;
-    listenSedeInfo();
-    listen();
-  }else{
-    firebase.auth().signInAnonymously();
-  }
-});
+function addItem(card,cat,item){
+  var itemId=id(cat,item);
+  var st=status(itemId);
+  var n=note(itemId);
+  var div=document.createElement("div");
+  div.className="item "+st;
+  div.innerHTML=
+    '<div class="main">'+
+    '<button class="check" type="button">'+tick()+'</button>'+
+    '<div style="flex:1;min-width:0">'+
+    '<div class="name">'+esc(item)+'</div>'+
+    '<div class="actions">'+
+    '<button data-s="missing" class="'+(st==="missing"?"a-missing":"")+'">Manca</button>'+
+    '<button data-s="ok" class="'+(st==="ok"?"a-ok":"")+'">OK arrivato</button>'+
+    '<button data-s="damaged" class="'+(st==="damaged"?"a-damaged":"")+'">Danneggiato all’arrivo</button>'+
+    '</div>'+
+    '<input class="note" placeholder="Nota per materiale mancante o danneggiato" value="'+esc(n)+'">'+
+    '</div></div>';
 
-/* EVENTI UI */
+  div.querySelector(".check").onclick=function(){setStatus(itemId,cat,item,st==="ok"?"missing":"ok")};
+  div.querySelectorAll(".actions button").forEach(function(b){b.onclick=function(){setStatus(itemId,cat,item,this.getAttribute("data-s"))}});
+  div.querySelector(".note").onchange=function(){setNote(itemId,cat,item,this.value)};
+  card.appendChild(div);
+}
+
+function summary(){
+  var a=all(),ok=0,mi=0,da=0;
+  a.forEach(function(x){
+    var st=status(x.id);
+    if(st==="ok")ok++;
+    else if(st==="damaged")da++;
+    else mi++;
+  });
+
+  var comp=ok+da,total=a.length,pct=total?Math.round(comp/total*100):0;
+  document.getElementById("okCount").innerHTML=ok;
+  document.getElementById("missingCount").innerHTML=mi;
+  document.getElementById("damagedCount").innerHTML=da;
+  document.getElementById("pct").innerHTML=pct+"%";
+  document.getElementById("count").innerHTML=comp+" / "+total+" verificati";
+  document.getElementById("bar").style.width=pct+"%";
+  document.getElementById("readyBanner").className=(mi===0&&da===0&&ok===total)?"ready show":"ready";
+}
+
+loginBtn.onclick=smartLogin;
+retryRedirectBtn.onclick=redirectLogin;
+
+document.getElementById("logout").onclick=function(){
+  if(unsubscribe)unsubscribe();
+  auth.signOut();
+};
 document.getElementById("search").oninput=render;
 document.getElementById("filter").onchange=render;
+document.getElementById("printBtn").onclick=function(){window.print()};
+document.getElementById("markAllOk").onclick=function(){
+  if(confirm("Segnare tutto OK arrivato per questa sede?")){
+    all().forEach(function(x){setStatus(x.id,x.cat,x.item,"ok")});
+  }
+};
+document.getElementById("reset").onclick=function(){
+  if(confirm("Azzerare la checklist cloud per questa sede? Tutti i materiali torneranno a Manca.")){
+    all().forEach(function(x){ref(x.id).delete()});
+  }
+};
+document.getElementById("csv").onclick=function(){
+  var rows=[["Sede","Categoria","Materiale","Stato","Note"]];
+  all().forEach(function(x){
+    var st=status(x.id);
+    var lab=st==="ok"?"OK ARRIVATO":st==="damaged"?"DANNEGGIATO ALL'ARRIVO":"MANCA";
+    rows.push([sede,x.cat,x.item,lab,note(x.id)]);
+  });
+  var csv=rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"'}).join(",")}).join("\n");
+  var blob=new Blob([csv],{type:"text/csv;charset=utf-8"});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement("a");
+  a.href=url;
+  a.download="check-materiale-"+sede+".csv";
+  a.click();
+  URL.revokeObjectURL(url);
+};
 
+auth.onAuthStateChanged(function(u){
+  loginBtn.disabled=false;
+  retryRedirectBtn.disabled=false;
+
+  if(!u){
+    user=null;
+    document.getElementById("loginView").style.display="grid";
+    document.getElementById("appView").className="hidden";
+    return;
+  }
+  if(!u.email || !u.email.endsWith("@fitup.it")){
+    showError("Accesso consentito solo con account FitUP @fitup.it.");
+    auth.signOut();
+    return;
+  }
+  clearLoginMessages();
+  user=u;
+  document.getElementById("loginView").style.display="none";
+  document.getElementById("appView").className="";
+  listen();
+});
 </script>
-
 </body>
 </html>
