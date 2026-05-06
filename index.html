@@ -380,6 +380,84 @@ var ADMIN_EMAILS=[
   "ramona.ruggiero@fitup.it"
 ];
 
+var OPEN_COMPLETED_SEDI=[
+  "FitUP Abbiategrasso",
+  "FitUP Albavilla",
+  "FitUP Avola",
+  "FitUp Arezzo",
+  "FitUP Belgioioso",
+  "FitUP Bernareggio",
+  "FitUP Biella",
+  "FitUP Borgo Virgilio",
+  "FitUP Borgosesia",
+  "FitUP Bra",
+  "FitUP Brembate",
+  "FitUP Brescia Est",
+  "FitUP Broni",
+  "FitUP Busto Arsizio",
+  "FitUP Cagliari Newton",
+  "FitUP Cagliari Elmas",
+  "FitUP Cambiago",
+  "FitUP Casale Monferrato",
+  "FitUP Castel Mella",
+  "FitUP Castenedolo",
+  "FitUP CastelFranco Veneto",
+  "FitUP Cassano D'Adda",
+  "FitUP Carbonia",
+  "FitUP Carpenedolo",
+  "FitUP Cecina",
+  "FitUP Cellatica",
+  "FitUP Cervignano",
+  "FitUP Chiari",
+  "FitUP Cinisello Balsamo",
+  "FitUP Codroipo",
+  "FitUP Collesalvetti",
+  "FitUP Corciano",
+  "FitUP Cremona",
+  "FitUP Desenzano del Garda",
+  "FitUP Ferrara Nord",
+  "FitUP Follonica",
+  "FitUP Giussano",
+  "FitUP Guardamiglio",
+  "FitUP Lecco",
+  "FitUP Lissone",
+  "FitUP Marcon",
+  "FitUP Melegnano",
+  "FitUP Montano Lucino",
+  "FitUP Montebelluna",
+  "FitUP Montecchio Maggiore",
+  "FitUP Montelabbate",
+  "FitUP Mortara",
+  "FitUP Nova Milanese",
+  "FitUP Novara",
+  "FitUP Occhiobello",
+  "FitUP Osnago",
+  "FitUP Paese",
+  "FitUP Osimo",
+  "FitUP Pescara",
+  "FitUP Piombino Dese",
+  "FitUP Ponsacco",
+  "FitUP Porto Mantovano",
+  "FitUP Rimini",
+  "FitUP Rosà",
+  "FitUP Rovigo",
+  "FitUP Sacile",
+  "FitUP San Donà di Piave 2",
+  "FitUP Seregno",
+  "FitUP Spilimbergo",
+  "FitUP Suisio",
+  "FitUP Susegana",
+  "FitUP Spresiano",
+  "FitUP Tavagnacco",
+  "FitUP Torino Mirafiori",
+  "FitUP Tortoreto",
+  "FitUP Trento",
+  "FitUP Vergiate",
+  "FitUP Vicenza",
+  "FitUP Vigevano",
+  "FitUP Zero Branco"
+];
+
 var loginBtn=document.getElementById("loginBtn");
 var retryRedirectBtn=document.getElementById("retryRedirectBtn");
 var loginError=document.getElementById("loginError");
@@ -499,6 +577,17 @@ function tick(){
 
 function normalizeEmail(v){
   return String(v||"").trim().toLowerCase();
+}
+
+function normalizeSedeName(v){
+  return String(v||"").trim().replace(/[ ]+/g," ").toLowerCase();
+}
+
+function isOpenCompletedSede(value){
+  var n=normalizeSedeName(value);
+  return OPEN_COMPLETED_SEDI.some(function(s){
+    return normalizeSedeName(s)===n;
+  });
 }
 
 function isAdmin(email){
@@ -701,11 +790,105 @@ function renderDashboard(app){
   app.innerHTML=
     '<section class="card" style="grid-column:1/-1">'+
     '<div class="view-panel-title">Dashboard globale sedi</div>'+
+    '<div id="dashboardCounters" class="view-panel-title">Caricamento conteggi...</div>'+
     '<table class="dashboard-table">'+
-    '<thead><tr><th>Club</th><th>Stato preparazione</th><th>Arrivo</th><th>Mancanti</th><th>Danneggiati</th></tr></thead>'+
-    '<tbody id="dashboardRows"><tr><td colspan="5">Dashboard dettagliata al prossimo step.</td></tr></tbody>'+
+    '<thead><tr><th>Club</th><th>Tipologia</th><th>Arrivo</th><th>OK</th><th>Mancanti</th><th>Danneggiati</th><th>Ultima modifica</th></tr></thead>'+
+    '<tbody id="dashboardRows"><tr><td colspan="7">Caricamento dashboard...</td></tr></tbody>'+
     '</table>'+
     '</section>';
+
+  var tbody=document.getElementById("dashboardRows");
+  var counters=document.getElementById("dashboardCounters");
+  var totalItems=all().length;
+
+  if(!sediAutorizzate.length){
+    tbody.innerHTML='<tr><td colspan="7">Nessuna sede disponibile.</td></tr>';
+    counters.innerHTML='Palestre aperte completate: 0 · Totale palestre/cantieri: 0';
+    return;
+  }
+
+  Promise.all(sediAutorizzate.map(function(s){
+    return db.collection("palestre").doc(s.id).collection("checklist").get().then(function(snapshot){
+      var ok=0;
+      var damaged=0;
+      var latestAt=null;
+      var latestBy="";
+      var isCompletedOpen=isOpenCompletedSede(s.club||s.id);
+
+      snapshot.forEach(function(doc){
+        var d=doc.data()||{};
+        if(d.status==="ok")ok++;
+        if(d.status==="damaged")damaged++;
+
+        if(d.updatedAt && d.updatedAt.toDate){
+          var dt=d.updatedAt.toDate();
+          if(!latestAt || dt>latestAt){
+            latestAt=dt;
+            latestBy=d.updatedBy||"";
+          }
+        }
+      });
+
+      if(isCompletedOpen){
+        ok=totalItems;
+        damaged=0;
+      }
+
+      var completed=ok+damaged;
+      var missing=isCompletedOpen?0:Math.max(totalItems-completed,0);
+      var pct=totalItems?Math.round((completed/totalItems)*100):0;
+      var latest=isCompletedOpen?"Sede già aperta/completata":"Nessuna modifica";
+
+      if(latestAt && !isCompletedOpen){
+        latest=latestAt.toLocaleString("it-IT",{
+          day:"2-digit",
+          month:"2-digit",
+          year:"numeric",
+          hour:"2-digit",
+          minute:"2-digit"
+        });
+        if(latestBy)latest += " · " + latestBy;
+      }
+
+      return {
+        id:s.id,
+        club:s.club||s.id,
+        type:isCompletedOpen?"Aperta completata":"Cantiere / da revisionare",
+        isCompletedOpen:isCompletedOpen,
+        pct:pct,
+        ok:ok,
+        missing:missing,
+        damaged:damaged,
+        latest:latest
+      };
+    });
+  })).then(function(rows){
+    rows.sort(function(a,b){
+      if(a.isCompletedOpen!==b.isCompletedOpen)return a.isCompletedOpen?1:-1;
+      if(a.pct!==b.pct)return a.pct-b.pct;
+      return a.club.localeCompare(b.club);
+    });
+
+    var openedCompletedCount=rows.filter(function(r){return r.isCompletedOpen}).length;
+    var totalSediCount=rows.length;
+    counters.innerHTML='Palestre aperte completate: '+openedCompletedCount+' · Totale palestre/cantieri: '+totalSediCount;
+
+    tbody.innerHTML=rows.map(function(r){
+      return '<tr>'+
+        '<td>'+esc(r.club)+'</td>'+
+        '<td>'+esc(r.type)+'</td>'+
+        '<td>'+r.pct+'%</td>'+
+        '<td>'+r.ok+'</td>'+
+        '<td>'+r.missing+'</td>'+
+        '<td>'+r.damaged+'</td>'+
+        '<td>'+esc(r.latest)+'</td>'+
+      '</tr>';
+    }).join("");
+  }).catch(function(error){
+    console.error("Dashboard error:",error);
+    tbody.innerHTML='<tr><td colspan="7">Errore caricamento dashboard.</td></tr>';
+    counters.innerHTML='Errore caricamento conteggi.';
+  });
 }
 
 function renderMagazzino(app){
