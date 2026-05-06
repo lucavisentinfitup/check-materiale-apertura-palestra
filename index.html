@@ -135,6 +135,58 @@ input:focus,select:focus{border-color:var(--green);box-shadow:0 0 0 4px rgba(141
   border:2px solid var(--green);
 }
 .ready.show{display:block}
+.view-switcher{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  margin-bottom:18px;
+  padding:14px;
+  border-radius:28px;
+  border:2px solid var(--line);
+  background:rgba(255,255,255,.78);
+  box-shadow:0 20px 60px rgba(0,0,0,.16);
+}
+.view-switcher button{
+  min-height:52px;
+  border-radius:18px;
+  border:2px solid var(--line);
+  background:white;
+  color:var(--black);
+  font-weight:900;
+  cursor:pointer;
+}
+.view-switcher button.active{
+  background:linear-gradient(135deg,#8DC63F,#c7f27d);
+  border-color:#6da52f;
+}
+.view-panel-title{
+  margin:0 0 18px;
+  padding:18px;
+  border-radius:24px;
+  background:rgba(255,255,255,.78);
+  border:2px solid var(--line);
+  font-weight:900;
+}
+.dashboard-table{
+  width:100%;
+  border-collapse:separate;
+  border-spacing:0 10px;
+}
+.dashboard-table th{
+  text-align:left;
+  font-size:13px;
+  color:#475569;
+  padding:10px;
+}
+.dashboard-table td{
+  background:rgba(255,255,255,.82);
+  border-top:2px solid rgba(29,29,27,.12);
+  border-bottom:2px solid rgba(29,29,27,.12);
+  padding:14px 10px;
+  font-weight:800;
+}
+.dashboard-table td:first-child{border-left:2px solid rgba(29,29,27,.12);border-radius:16px 0 0 16px}
+.dashboard-table td:last-child{border-right:2px solid rgba(29,29,27,.12);border-radius:0 16px 16px 0}
 .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
 .card{
   border-radius:30px;
@@ -267,6 +319,12 @@ h2{margin:0;font-size:19px}
 <div class="ready" id="readyBanner">✅ Tutto il materiale risulta arrivato e conforme.</div>
 <div class="no-sedi hidden" id="noSedi">Nessuna sede assegnata al tuo account. Verifica che la tua email sia presente nel Google Sheet nelle colonne AD o AE.</div>
 
+<section class="view-switcher hidden" id="adminViewSwitcher">
+  <button type="button" data-view="dashboard">Dashboard</button>
+  <button type="button" data-view="magazzino">Magazzino</button>
+  <button type="button" data-view="checklist">Checklist arrivo</button>
+</section>
+
 <section class="toolbar">
   <select id="sedeSelect"></select>
   <input id="search" placeholder="Cerca materiale">
@@ -308,6 +366,7 @@ var cloud={};
 var unsubscribe=null;
 var sede="";
 var sediAutorizzate=[];
+var currentView="checklist";
 
 var ADMIN_EMAILS=[
   "luca.visentin@fitup.it",
@@ -317,7 +376,8 @@ var ADMIN_EMAILS=[
   "dm@fitup.it",
   "alessandro.genova@fitup.it",
   "manuela.santambrogio@fitup.it",
-  "davide.diamante@fitup.it"      
+  "davide.diamante@fitup.it",
+  "ramona.ruggiero@fitup.it"
 ];
 
 var loginBtn=document.getElementById("loginBtn");
@@ -325,6 +385,7 @@ var retryRedirectBtn=document.getElementById("retryRedirectBtn");
 var loginError=document.getElementById("loginError");
 var loginInfo=document.getElementById("loginInfo");
 var sedeSelect=document.getElementById("sedeSelect");
+var adminViewSwitcher=document.getElementById("adminViewSwitcher");
 
 var sections=[
 {icon:"🔧",title:"Materiale tecnico base",items:["Tornello","Impianto Audio","Rack 19\"","Patch Panel Rack","Dadi a gabbia per rack (20)","Ripiano Rack (2)","Ciabatta Shuko Rack (2)","Cavo Patch Ethernet 0,5m (3x10)","Cavo Patch Ethernet 1m (3x10)","Hard Disk","NVR Dahua"]},
@@ -442,6 +503,25 @@ function normalizeEmail(v){
 
 function isAdmin(email){
   return ADMIN_EMAILS.indexOf(normalizeEmail(email))!==-1;
+}
+
+function updateAdminViewSwitcher(){
+  if(!user || !isAdmin(user.email)){
+    adminViewSwitcher.className="view-switcher hidden";
+    currentView="checklist";
+    return;
+  }
+
+  adminViewSwitcher.className="view-switcher";
+  adminViewSwitcher.querySelectorAll("button").forEach(function(btn){
+    btn.className=btn.getAttribute("data-view")===currentView?"active":"";
+  });
+}
+
+function setView(view){
+  currentView=view;
+  updateAdminViewSwitcher();
+  render();
 }
 
 function uniqueSedi(list){
@@ -570,6 +650,8 @@ function setNote(itemId,cat,item,value){
 }
 
 function render(){
+  updateAdminViewSwitcher();
+
   document.getElementById("meta").innerHTML="Sede: "+esc(sede||"-")+" · Utente: "+esc(user?user.email:"");
   var q=(document.getElementById("search").value||"").toLowerCase();
   var f=document.getElementById("filter").value;
@@ -577,6 +659,18 @@ function render(){
   app.innerHTML="";
 
   if(!sede){
+    summary();
+    return;
+  }
+
+  if(currentView==="dashboard"){
+    renderDashboard(app);
+    summary();
+    return;
+  }
+
+  if(currentView==="magazzino"){
+    renderMagazzino(app);
     summary();
     return;
   }
@@ -601,6 +695,25 @@ function render(){
   });
 
   summary();
+}
+
+function renderDashboard(app){
+  app.innerHTML=
+    '<section class="card" style="grid-column:1/-1">'+
+    '<div class="view-panel-title">Dashboard globale sedi</div>'+
+    '<table class="dashboard-table">'+
+    '<thead><tr><th>Club</th><th>Stato preparazione</th><th>Arrivo</th><th>Mancanti</th><th>Danneggiati</th></tr></thead>'+
+    '<tbody id="dashboardRows"><tr><td colspan="5">Dashboard dettagliata al prossimo step.</td></tr></tbody>'+
+    '</table>'+
+    '</section>';
+}
+
+function renderMagazzino(app){
+  app.innerHTML=
+    '<section class="card" style="grid-column:1/-1">'+
+    '<div class="view-panel-title">Vista Magazzino - '+esc(sede||"-")+'</div>'+
+    '<p style="margin:0;font-weight:800;line-height:1.5;color:#475569">Qui inseriremo lo stato di preparazione/spedizione del materiale: Da preparare, Preparato, Non disponibile, Spedito.</p>'+
+    '</section>';
 }
 
 function addItem(card,cat,item){
@@ -668,6 +781,12 @@ document.getElementById("search").oninput=render;
 document.getElementById("filter").onchange=render;
 document.getElementById("printBtn").onclick=function(){window.print()};
 
+adminViewSwitcher.querySelectorAll("button").forEach(function(btn){
+  btn.onclick=function(){
+    setView(this.getAttribute("data-view"));
+  };
+});
+
 document.getElementById("markAllOk").onclick=function(){
   if(!sede)return;
   if(confirm("Segnare tutto OK arrivato per questa sede?")){
@@ -722,8 +841,10 @@ auth.onAuthStateChanged(function(u){
 
   clearLoginMessages();
   user=u;
+  currentView=isAdmin(user.email)?"dashboard":"checklist";
   document.getElementById("loginView").style.display="none";
   document.getElementById("appView").className="";
+  updateAdminViewSwitcher();
   loadAuthorizedSedi();
 });
 </script>
