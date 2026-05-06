@@ -367,6 +367,7 @@ var unsubscribe=null;
 var sede="";
 var sediAutorizzate=[];
 var currentView="checklist";
+var dashboardRowsCache=[];
 
 var ADMIN_EMAILS=[
   "luca.visentin@fitup.it",
@@ -590,6 +591,148 @@ function isOpenCompletedSede(value){
   });
 }
 
+function parseItalianDate(value){
+  if(!value)return null;
+
+  if(value && value.toDate){
+    return value.toDate();
+  }
+
+  var s=String(value).trim();
+  if(!s)return null;
+
+  var iso=s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if(iso)return new Date(Number(iso[1]),Number(iso[2])-1,Number(iso[3]));
+
+  var it=s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})$/);
+  if(it){
+    var y=Number(it[3]);
+    if(y<100)y+=2000;
+    return new Date(y,Number(it[2])-1,Number(it[1]));
+  }
+
+  var d=new Date(s);
+  return isNaN(d.getTime())?null:d;
+}
+
+function formatOpenDate(value){
+  var d=parseItalianDate(value);
+  if(!d)return esc(value||"");
+  return d.toLocaleDateString("it-IT",{
+    day:"2-digit",
+    month:"2-digit",
+    year:"numeric"
+  });
+}
+
+function dateInputToDate(value){
+  if(!value)return null;
+  var parts=value.split("-");
+  if(parts.length!==3)return null;
+  return new Date(Number(parts[0]),Number(parts[1])-1,Number(parts[2]));
+}
+
+function sameOrAfter(a,b){
+  if(!a || !b)return true;
+  return a.getTime()>=b.getTime();
+}
+
+function sameOrBefore(a,b){
+  if(!a || !b)return true;
+  return a.getTime()<=b.getTime();
+}
+
+function bindDashboardDateFilters(){
+  var from=document.getElementById("openDateFrom");
+  var to=document.getElementById("openDateTo");
+  var clear=document.getElementById("clearDateFilter");
+
+  if(from)from.onchange=paintDashboardRows;
+  if(to)to.onchange=paintDashboardRows;
+  if(clear){
+    clear.onclick=function(){
+      if(from)from.value="";
+      if(to)to.value="";
+      paintDashboardRows();
+    };
+  }
+}
+
+function paintDashboardRows(){
+  var tbody=document.getElementById("dashboardRows");
+  var counters=document.getElementById("dashboardCounters");
+  if(!tbody || !counters)return;
+
+  var fromEl=document.getElementById("openDateFrom");
+  var toEl=document.getElementById("openDateTo");
+  var from=dateInputToDate(fromEl?fromEl.value:"");
+  var to=dateInputToDate(toEl?toEl.value:"");
+
+  var rows=dashboardRowsCache.filter(function(r){
+    var openDate=parseItalianDate(r.inaugurazione);
+    if((from || to) && !openDate)return false;
+    return sameOrAfter(openDate,from) && sameOrBefore(openDate,to);
+  });
+
+  rows.sort(function(a,b){
+    var ad=parseItalianDate(a.inaugurazione);
+    var bd=parseItalianDate(b.inaugurazione);
+    if(ad && bd && ad.getTime()!==bd.getTime())return ad-bd;
+    if(ad && !bd)return -1;
+    if(!ad && bd)return 1;
+    if(a.isCompletedOpen!==b.isCompletedOpen)return a.isCompletedOpen?1:-1;
+    if(a.pct!==b.pct)return a.pct-b.pct;
+    return a.club.localeCompare(b.club);
+  });
+
+  var openedCompletedCount=rows.filter(function(r){return r.isCompletedOpen}).length;
+  var totalSediCount=rows.length;
+  counters.innerHTML='Palestre aperte completate: '+openedCompletedCount+' · Totale palestre/cantieri: '+totalSediCount;
+
+  if(!rows.length){
+    tbody.innerHTML='<tr><td colspan="8">Nessuna sede trovata con questi filtri.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML=rows.map(function(r){
+    return '<tr>'+
+      '<td>'+esc(r.club)+'</td>'+
+      '<td>'+esc(r.type)+'</td>'+
+      '<td>'+formatOpenDate(r.inaugurazione)+'</td>'+
+      '<td>'+r.pct+'%</td>'+
+      '<td>'+r.ok+'</td>'+
+      '<td>'+r.missing+'</td>'+
+      '<td>'+r.damaged+'</td>'+
+      '<td>'+esc(r.latest)+'</td>'+
+    '</tr>';
+  }).join("");
+}
+
+function normalizeSedeName(v){
+  return String(v||"").trim().replace(/\s+/g," ").toLowerCase();
+}
+
+function isOpenCompletedSede(value){
+  var n=normalizeSedeName(value);
+  return OPEN_COMPLETED_SEDI.some(function(s){
+    return normalizeSedeName(s)===n;
+  });
+}
+
+function normalizeSedeName(v){
+  return String(v||"")
+    .trim()
+    .replace(/\s+/g," ")
+    .toLowerCase();
+}
+
+function isOpenCompletedSede(value){
+  var n=normalizeSedeName(value);
+  return OPEN_COMPLETED_SEDI.some(function(s){
+    return normalizeSedeName(s)===n;
+  });
+}
+
 function isAdmin(email){
   return ADMIN_EMAILS.indexOf(normalizeEmail(email))!==-1;
 }
@@ -634,7 +777,7 @@ function loadAuthorizedSedi(){
       var out=[];
       snapshot.forEach(function(doc){
         var d=doc.data();
-        out.push({id:doc.id,club:d.club||doc.id});
+        out.push({id:doc.id,club:d.club||doc.id,inaugurazione:d.inaugurazione||""});
       });
       return out;
     });
@@ -647,7 +790,7 @@ function loadAuthorizedSedi(){
       results.forEach(function(snapshot){
         snapshot.forEach(function(doc){
           var d=doc.data();
-          out.push({id:doc.id,club:d.club||doc.id});
+          out.push({id:doc.id,club:d.club||doc.id,inaugurazione:d.inaugurazione||""});
         });
       });
       return uniqueSedi(out);
@@ -791,9 +934,14 @@ function renderDashboard(app){
     '<section class="card" style="grid-column:1/-1">'+
     '<div class="view-panel-title">Dashboard globale sedi</div>'+
     '<div id="dashboardCounters" class="view-panel-title">Caricamento conteggi...</div>'+
+    '<div class="toolbar" style="grid-template-columns:1fr 1fr 150px;margin-bottom:10px">'+
+    '<input id="openDateFrom" type="date" aria-label="Inaugurazione da">'+
+    '<input id="openDateTo" type="date" aria-label="Inaugurazione a">'+
+    '<button class="btn light" id="clearDateFilter" type="button">Pulisci date</button>'+
+    '</div>'+
     '<table class="dashboard-table">'+
-    '<thead><tr><th>Club</th><th>Tipologia</th><th>Arrivo</th><th>OK</th><th>Mancanti</th><th>Danneggiati</th><th>Ultima modifica</th></tr></thead>'+
-    '<tbody id="dashboardRows"><tr><td colspan="7">Caricamento dashboard...</td></tr></tbody>'+
+    '<thead><tr><th>Club</th><th>Tipologia</th><th>Inaugurazione</th><th>Arrivo</th><th>OK</th><th>Mancanti</th><th>Danneggiati</th><th>Ultima modifica</th></tr></thead>'+
+    '<tbody id="dashboardRows"><tr><td colspan="8">Caricamento dashboard...</td></tr></tbody>'+
     '</table>'+
     '</section>';
 
@@ -802,7 +950,7 @@ function renderDashboard(app){
   var totalItems=all().length;
 
   if(!sediAutorizzate.length){
-    tbody.innerHTML='<tr><td colspan="7">Nessuna sede disponibile.</td></tr>';
+    tbody.innerHTML='<tr><td colspan="8">Nessuna sede disponibile.</td></tr>';
     counters.innerHTML='Palestre aperte completate: 0 · Totale palestre/cantieri: 0';
     return;
   }
@@ -853,6 +1001,7 @@ function renderDashboard(app){
       return {
         id:s.id,
         club:s.club||s.id,
+        inaugurazione:s.inaugurazione||"",
         type:isCompletedOpen?"Aperta completata":"Cantiere / da revisionare",
         isCompletedOpen:isCompletedOpen,
         pct:pct,
@@ -863,32 +1012,80 @@ function renderDashboard(app){
       };
     });
   })).then(function(rows){
-    rows.sort(function(a,b){
-      if(a.isCompletedOpen!==b.isCompletedOpen)return a.isCompletedOpen?1:-1;
-      if(a.pct!==b.pct)return a.pct-b.pct;
-      return a.club.localeCompare(b.club);
-    });
-
-    var openedCompletedCount=rows.filter(function(r){return r.isCompletedOpen}).length;
-    var totalSediCount=rows.length;
-    counters.innerHTML='Palestre aperte completate: '+openedCompletedCount+' · Totale palestre/cantieri: '+totalSediCount;
-
-    tbody.innerHTML=rows.map(function(r){
-      return '<tr>'+
-        '<td>'+esc(r.club)+'</td>'+
-        '<td>'+esc(r.type)+'</td>'+
-        '<td>'+r.pct+'%</td>'+
-        '<td>'+r.ok+'</td>'+
-        '<td>'+r.missing+'</td>'+
-        '<td>'+r.damaged+'</td>'+
-        '<td>'+esc(r.latest)+'</td>'+
-      '</tr>';
-    }).join("");
+    dashboardRowsCache=rows;
+    bindDashboardDateFilters();
+    paintDashboardRows();
   }).catch(function(error){
     console.error("Dashboard error:",error);
-    tbody.innerHTML='<tr><td colspan="7">Errore caricamento dashboard.</td></tr>';
+    tbody.innerHTML='<tr><td colspan="8">Errore caricamento dashboard.</td></tr>';
     counters.innerHTML='Errore caricamento conteggi.';
   });
+}
+
+function bindDashboardDateFilters(){
+  var from=document.getElementById("openDateFrom");
+  var to=document.getElementById("openDateTo");
+  var clear=document.getElementById("clearDateFilter");
+
+  if(from)from.onchange=paintDashboardRows;
+  if(to)to.onchange=paintDashboardRows;
+  if(clear){
+    clear.onclick=function(){
+      if(from)from.value="";
+      if(to)to.value="";
+      paintDashboardRows();
+    };
+  }
+}
+
+function paintDashboardRows(){
+  var tbody=document.getElementById("dashboardRows");
+  var counters=document.getElementById("dashboardCounters");
+  if(!tbody || !counters)return;
+
+  var fromEl=document.getElementById("openDateFrom");
+  var toEl=document.getElementById("openDateTo");
+  var from=dateInputToDate(fromEl?fromEl.value:"");
+  var to=dateInputToDate(toEl?toEl.value:"");
+
+  var rows=dashboardRowsCache.filter(function(r){
+    var openDate=parseItalianDate(r.inaugurazione);
+    if((from || to) && !openDate)return false;
+    return sameOrAfter(openDate,from) && sameOrBefore(openDate,to);
+  });
+
+  rows.sort(function(a,b){
+    var ad=parseItalianDate(a.inaugurazione);
+    var bd=parseItalianDate(b.inaugurazione);
+    if(ad && bd && ad.getTime()!==bd.getTime())return ad-bd;
+    if(ad && !bd)return -1;
+    if(!ad && bd)return 1;
+    if(a.isCompletedOpen!==b.isCompletedOpen)return a.isCompletedOpen?1:-1;
+    if(a.pct!==b.pct)return a.pct-b.pct;
+    return a.club.localeCompare(b.club);
+  });
+
+  var openedCompletedCount=rows.filter(function(r){return r.isCompletedOpen}).length;
+  var totalSediCount=rows.length;
+  counters.innerHTML='Palestre aperte completate: '+openedCompletedCount+' · Totale palestre/cantieri: '+totalSediCount;
+
+  if(!rows.length){
+    tbody.innerHTML='<tr><td colspan="8">Nessuna sede trovata con questi filtri.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML=rows.map(function(r){
+    return '<tr>'+
+      '<td>'+esc(r.club)+'</td>'+
+      '<td>'+esc(r.type)+'</td>'+
+      '<td>'+formatOpenDate(r.inaugurazione)+'</td>'+
+      '<td>'+r.pct+'%</td>'+
+      '<td>'+r.ok+'</td>'+
+      '<td>'+r.missing+'</td>'+
+      '<td>'+r.damaged+'</td>'+
+      '<td>'+esc(r.latest)+'</td>'+
+    '</tr>';
+  }).join("");
 }
 
 function renderMagazzino(app){
