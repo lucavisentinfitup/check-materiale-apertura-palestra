@@ -265,6 +265,13 @@ h2{margin:0;font-size:19px}
 .ok .check{border-color:var(--green);box-shadow:0 0 0 4px rgba(141,198,63,.18)}
 .ok .check svg{opacity:1;transform:scale(1)}
 .name{font-weight:900;line-height:1.28}
+ .audit{
+  margin-top:6px;
+  font-size:12px;
+  color:#64748b;
+  line-height:1.4;
+  word-break:break-word;
+}       
 .ok .name{color:#4b7d12}.missing .name{color:#92400e}.damaged .name{color:#991b1b}
 .actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
 .actions button{
@@ -519,6 +526,31 @@ function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").repl
 function all(){var a=[];sections.forEach(function(sec){sec.items.forEach(function(item){a.push({cat:sec.title,item:item,id:id(sec.title,item)})})});return a}
 function status(x){return cloud[x]&&cloud[x].status?cloud[x].status:"missing"}
 function note(x){return cloud[x]&&cloud[x].note?cloud[x].note:""}
+
+function lastUpdate(x){
+  if(!cloud[x]) return "";
+
+  var by = cloud[x].updatedBy || "";
+  var at = cloud[x].updatedAt;
+
+  if(!by && !at){
+    return "Nessuna modifica registrata";
+  }
+
+  var date = "";
+
+  if(at && at.toDate){
+    date = at.toDate().toLocaleString("it-IT",{
+      day:"2-digit",
+      month:"2-digit",
+      year:"numeric",
+      hour:"2-digit",
+      minute:"2-digit"
+    });
+  }
+
+  return "Ultima modifica: " + (date || "data non disponibile") + (by ? " · " + by : "");
+}        
 function ref(itemId){return db.collection("palestre").doc(sede).collection("checklist").doc(itemId)}
 function tick(){return '<svg viewBox="0 0 1024 1024"><defs><linearGradient id="g" x1="0" y1="1" x2="1" y2="0"><stop offset="0%" stop-color="#047857"/><stop offset="100%" stop-color="#8DC63F"/></linearGradient></defs><path fill="url(#g)" d="M400.5 744.1c-35.6 0-67.9-20.5-83.1-52.8L205.2 452.7c-21.6-45.9-1.9-100.6 44-122.2 45.9-21.6 100.6-1.9 122.2 44l44.5 94.6L642.6 160.5c30-40.9 87.5-49.7 128.4-19.7 40.9 30 49.7 87.5 19.7 128.4L474.6 699.9c-17.3 23.6-44.8 37.6-74.1 44.2z"/></svg>'}
 
@@ -596,6 +628,7 @@ function addItem(card,cat,item){
     '<button class="check" type="button">'+tick()+'</button>'+
     '<div style="flex:1;min-width:0">'+
     '<div class="name">'+esc(item)+'</div>'+
+'<div class="audit">'+esc(lastUpdate(itemId))+'</div>'+
     '<div class="actions">'+
     '<button data-s="missing" class="'+(st==="missing"?"a-missing":"")+'">Manca</button>'+
     '<button data-s="ok" class="'+(st==="ok"?"a-ok":"")+'">OK arrivato</button>'+
